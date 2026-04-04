@@ -25,7 +25,7 @@ final class AuthorizationViewModel {
     
     var username: String = ""
     var password = ""
-    var mail = ""
+    var email = ""
     
     //MARK: Init
     
@@ -56,11 +56,11 @@ final class AuthorizationViewModel {
         }
     }
     
-    func sendCodeToMail() {
+    func sendCodeToEmail() {
         isLoading = true
         errorMessage = nil
-        
-        authService.sendAuthCode(to: mail) { [weak self] result in
+        print("email loged")
+        authService.sendAuthCode(to: email) { [weak self] result in
             DispatchQueue.main.async {
                 self?.isLoading = false
                 
@@ -82,7 +82,7 @@ final class AuthorizationViewModel {
     
     func clearFields() {
         username = ""
-        mail = ""
+        email = ""
         password = ""
         errorMessage = nil
     }

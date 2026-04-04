@@ -25,10 +25,12 @@ final class LaunchView: UIView {
     private let subtitleLabel: UILabel = {
         let label = UILabel()
         label.text = "subtitle".localized
-        label.font = .systemFont(ofSize: 20, weight: .medium)
-        label.textColor = .primaryBlueContent
+        label.font = .systemFont(ofSize: 26)
+        label.textColor = .titleInversed
         label.textAlignment = .center
+        label.sizeToFit()
         label.alpha = 0
+        
         return label
     }()
     
@@ -96,9 +98,10 @@ final class LaunchView: UIView {
         }
         
         subtitleLabel.snp.makeConstraints { make in
-            make.top.equalTo(titleLabel.snp.bottom).offset(10)
+            make.top.equalTo(titleLabel.snp.bottomMargin).offset(10)
             make.centerX.equalToSuperview()
             make.leading.trailing.equalToSuperview().inset(32)
+            
         }
         
         activityIndicator.snp.makeConstraints { make in
@@ -125,7 +128,7 @@ final class LaunchView: UIView {
             // Принудительно обновляем layout
             self.setNeedsLayout()
             
-            UIView.animate(withDuration: 0.6, delay: 0, usingSpringWithDamping: 0.7, initialSpringVelocity: 0.8, options: .curveEaseOut) {
+            UIView.animate(withDuration: 0.6, delay: 0, usingSpringWithDamping: 1.1, initialSpringVelocity: 0.5, options: .curveEaseOut) {
                 self.layoutIfNeeded()
             } completion: { _ in
                 print("📍 TitleView moved down")
@@ -154,7 +157,7 @@ final class LaunchView: UIView {
         DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
             print("📍 Fading out")
             UIView.animate(withDuration: 0.3) {
-                self.alpha = 0
+                self.alpha = 1
             } completion: { _ in
                 completion()
             }

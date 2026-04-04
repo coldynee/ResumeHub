@@ -25,7 +25,6 @@ final class AuthorizationView: UIView {
     private let contentView: UIView = {
         let view = UIView()
         view.backgroundColor = .primaryBackground
-        view.layer.cornerRadius = 150
         
         return view
     }()
@@ -95,18 +94,21 @@ final class AuthorizationView: UIView {
     }()
     
     private let authTypeSegment: UISegmentedControl = {
-        let segment = UISegmentedControl(items: ["login".localized, "mail".localized])
+        let segment = UISegmentedControl(items: ["login".localized, "email".localized])
         segment.selectedSegmentIndex = 0
         
         return segment
     }()
     
-    private let mailTextField: UITextField = {
+    private let emailTextField: UITextField = {
         let textField = UITextField()
-        textField.placeholder = "mailInput".localized
+        textField.placeholder = "emailInput".localized
         textField.borderStyle = .roundedRect
         textField.isHidden = true
         textField.font = UIFont(name: "System", size: 14)
+        textField.autocorrectionType = .no
+        textField.autocapitalizationType = .none
+        textField.spellCheckingType = .no
         
         return textField
     }()
@@ -116,6 +118,9 @@ final class AuthorizationView: UIView {
         textField.placeholder = "loginInput".localized
         textField.borderStyle = .roundedRect
         textField.font = UIFont(name: "System", size: 14)
+        textField.autocorrectionType = .no
+        textField.autocapitalizationType = .none
+        textField.spellCheckingType = .no
         
         return textField
     }()
@@ -126,7 +131,8 @@ final class AuthorizationView: UIView {
         textField.borderStyle = .roundedRect
         textField.font = UIFont(name: "System", size: 14)
         textField.isSecureTextEntry = true
-        
+        textField.textContentType = .oneTimeCode
+        textField.enablePasswordToggle()
         
         return textField
     }()
@@ -147,6 +153,7 @@ final class AuthorizationView: UIView {
         button.setTitleColor(.primaryBlueContent, for: .normal)
         button.backgroundColor = .primaryBackgroundInversed
         button.layer.cornerRadius = 20
+        button.alpha = 0.4
         
         return button
     }()
@@ -164,7 +171,7 @@ final class AuthorizationView: UIView {
     
     //MARK: State properties for view
     
-    private var isKeyboardVisible = false
+    
     private let authViewBackgroundColor: UIColor = .primaryBackground
     private var activeTextField: UITextField?
     
@@ -172,7 +179,7 @@ final class AuthorizationView: UIView {
     
     var onAuthTypeChanged: ((Bool) -> Void)?
     var onLoginChanged: ((String) -> Void)?
-    var onMailChanged: ((String) -> Void)?
+    var onEmailChanged: ((String) -> Void)?
     var onPasswordChanged: ((String) -> Void)?
     var onForgotPasswordTaped: (() -> Void)?
     var onSignInButtonTaped: (() -> Void)?
@@ -187,7 +194,7 @@ final class AuthorizationView: UIView {
         setupConstraints()
         setupActions()
         setupTextFieldDelegates()
-        setupKeyboardHandling()
+        animateElements()
     }
     
     required init?(coder: NSCoder) {
@@ -209,7 +216,7 @@ final class AuthorizationView: UIView {
         contentView.addSubview(subtitleLabel)
         contentView.addSubview(authToContinueLabel)
         contentView.addSubview(authTypeSegment)
-        contentView.addSubview(mailTextField)
+        contentView.addSubview(emailTextField)
         contentView.addSubview(loginTextField)
         contentView.addSubview(passwordTextField)
         
@@ -253,7 +260,7 @@ final class AuthorizationView: UIView {
             $0.height.equalTo(40)
             $0.centerX.equalToSuperview()
         }
-        mailTextField.snp.makeConstraints {
+        emailTextField.snp.makeConstraints {
             $0.top.equalTo(authTypeSegment.snp.bottom).offset(35)
             $0.trailing.leading.equalToSuperview().inset(40)
             $0.height.equalTo(50)
@@ -295,10 +302,27 @@ final class AuthorizationView: UIView {
         }
     }
     
+    //MARK: Animations
+    private func animateElements() {
+        let elements = [authToContinueLabel, authTypeSegment, loginTextField,
+                                       emailTextField, passwordTextField, forgotPasswordButton,
+                                       loginButton, registerButton]
+        elements.forEach { element in
+            element.alpha = 0
+            element.transform = CGAffineTransform(translationX: 0, y: 30)
+        }
+        for (index, element) in elements.enumerated() {
+            UIView.animate(withDuration: 0.5, delay: 0.1 * Double(index)) {
+                element.alpha = 1
+                element.transform = .identity
+            }
+        }
+    }
+    
     //MARK: Setup actions
     
     private func setupActions() {
-        mailTextField.addTarget(self, action: #selector(textFieldChanged), for: .editingChanged)
+        emailTextField.addTarget(self, action: #selector(textFieldChanged), for: .editingChanged)
         loginTextField.addTarget(self, action: #selector(textFieldChanged), for: .editingChanged)
         passwordTextField.addTarget(self, action: #selector(textFieldChanged), for: .editingChanged)
         authTypeSegment.addTarget(self, action: #selector(authTypeChanged), for: .valueChanged)
@@ -311,42 +335,10 @@ final class AuthorizationView: UIView {
     
     private func setupTextFieldDelegates() {
         loginTextField.delegate = self
-        mailTextField.delegate = self
+        emailTextField.delegate = self
         passwordTextField.delegate = self
     }
-    
-    private func setupKeyboardHandling() {
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(keyboardWillShow),
-                                               name: UIResponder.keyboardWillShowNotification,
-                                               object: nil)
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(keyboardWillHide),
-                                               name: UIResponder.keyboardWillHideNotification,
-                                               object: nil)
-        
-        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dissmissKeyboard))
-        addGestureRecognizer(tapGesture)
-    }
-    
-    @objc func keyboardWillShow(_ notification: Notification) {
-        guard !isKeyboardVisible,
-              let animationDuration = notification.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? TimeInterval else { return }
-        isKeyboardVisible = true
-        
-    }
-    
-    @objc func keyboardWillHide(_ notification: Notification) {
-        guard isKeyboardVisible,
-              let animationDuration = notification.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? TimeInterval else { return }
-        
-        isKeyboardVisible = false
-    }
-    
-    @objc private func dissmissKeyboard() {
-        endEditing(true)
-    }
-    
+
     //MARK: Validation
     
     private func validateFields() -> Bool {
@@ -356,14 +348,14 @@ final class AuthorizationView: UIView {
             let passwordText = passwordTextField.text ?? ""
             return !loginText.isEmpty && !passwordText.isEmpty
         } else {
-            let mailText = mailTextField.text ?? ""
-            return isValidEmail(mailText)
+            let emailText = emailTextField.text ?? ""
+            return isValidEmail(emailText)
         }
     }
-    func isValidEmail(_ mail: String) -> Bool {
+    func isValidEmail(_ email: String) -> Bool {
         let emailRegex = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,64}"
         let emailPredicate = NSPredicate(format: "SELF MATCHES %@", emailRegex)
-        return emailPredicate.evaluate(with: mail)
+        return emailPredicate.evaluate(with: email)
     }
     
     //MARK: Public methods
@@ -371,7 +363,7 @@ final class AuthorizationView: UIView {
     func showLoading(_ isLoading: Bool) {
         if isLoading {
             loginButton.isEnabled = false
-            loginButton.setTitle("", for: .normal)
+            loginButton.setTitle("processing".localized, for: .normal)
         } else {
             loginButton.isEnabled = validateFields()
             loginButton.setTitle("loginSign".localized, for: .normal)
@@ -390,8 +382,8 @@ final class AuthorizationView: UIView {
     func getLogin() -> String {
         return loginTextField.text ?? ""
     }
-    func getMail() -> String {
-        return mailTextField.text ?? ""
+    func getEmail() -> String {
+        return emailTextField.text ?? ""
     }
     func getPassword() -> String {
         return passwordTextField.text ?? ""
@@ -400,15 +392,15 @@ final class AuthorizationView: UIView {
         return authTypeSegment.selectedSegmentIndex == 0 // true - login, false - mail
     }
     func clearFields() {
-        loginTextField.text = ""
-        passwordTextField.text = ""
-        mailTextField.text = ""
+        loginTextField.text = nil
+        passwordTextField.text = nil
+        emailTextField.text = nil
         showError(nil)
         updateLoginButtonState()
     }
     func updateLoginButtonState() {
         loginButton.isEnabled = validateFields()
-        loginButton.alpha = loginButton.isEnabled ? 1: 0.6
+        loginButton.alpha = loginButton.isEnabled ? 1: 0.4
     }
     
     //MARK: Actions
@@ -416,7 +408,7 @@ final class AuthorizationView: UIView {
     @objc private func authTypeChanged() {
         let isLoginMode = authTypeSegment.selectedSegmentIndex == 0
         loginTextField.isHidden = !isLoginMode
-        mailTextField.isHidden = isLoginMode
+        emailTextField.isHidden = isLoginMode
         passwordTextField.isHidden = !isLoginMode
         
         updateLoginButtonState()
@@ -427,12 +419,11 @@ final class AuthorizationView: UIView {
         updateLoginButtonState()
         let isLoginMode = authTypeSegment.selectedSegmentIndex == 0
 
-        
         if isLoginMode {
             onLoginChanged?(loginTextField.text ?? "")
             onPasswordChanged?(passwordTextField.text ?? "")
         } else {
-            onMailChanged?(mailTextField.text ?? "")
+            onEmailChanged?(emailTextField.text ?? "")
         }
     }
     
@@ -440,11 +431,11 @@ final class AuthorizationView: UIView {
         onSignInButtonTaped?()
     }
     @objc private func forgotButtonTaped() {
-        print("🔔 forgotButtonTaped called")
+        
         onForgotPasswordTaped?()
     }
     @objc private func registerTaped() {
-        print("🔔 registerTaped called")
+        
         onRegisterTaped?()
     }
 }
@@ -455,7 +446,7 @@ extension AuthorizationView: UITextFieldDelegate {
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         if textField == loginTextField {
             passwordTextField.becomeFirstResponder()
-        } else if textField == passwordTextField || textField == mailTextField {
+        } else if textField == passwordTextField || textField == emailTextField {
             textField.resignFirstResponder()
             if loginButton.isEnabled {
                 onSignInButtonTaped?()
@@ -475,7 +466,7 @@ extension AuthorizationView: UITextFieldDelegate {
         updateLoginButtonState()
     }
     func textFieldShouldBeginEditing(_ textField: UITextField) -> Bool {
-        mailTextField.keyboardType = .emailAddress
+        emailTextField.keyboardType = .emailAddress
         showError(nil)
         return true
     }

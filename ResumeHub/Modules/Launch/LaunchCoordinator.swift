@@ -52,7 +52,14 @@ final class LaunchCoordinator: Coordinator, LaunchCoordinatorProtocol {
     }
     
     private func showMainScreen() {
-        print("12131")
+        print("logged from user defaults")
+        let authCoordinator = AuthorizationCoordinator(
+            navigationController: navigationController,
+            authService: authService,
+            userManager: userManager
+        )
+        addChild(authCoordinator)
+        authCoordinator.start()
 //        let mainCoordinator = MainTabBarCoordinator(
 //            navigationController: navigationController,
 //            userManager: userManager
@@ -60,4 +67,5 @@ final class LaunchCoordinator: Coordinator, LaunchCoordinatorProtocol {
 //        addChild(mainCoordinator)
 //        mainCoordinator.start()
     }
+    
 }

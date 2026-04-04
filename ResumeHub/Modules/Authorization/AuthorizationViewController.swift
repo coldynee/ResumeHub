@@ -72,8 +72,8 @@ final class AuthorizationViewController: UIViewController {
         mainView.onLoginChanged = { [weak self] username in
             self?.viewModel.username = username
         }
-        mainView.onMailChanged = { [weak self] mail in
-            self?.viewModel.mail = mail
+        mainView.onEmailChanged = { [weak self] email in
+            self?.viewModel.email = email
         }
         mainView.onPasswordChanged = { [weak self] password in
             self?.viewModel.password = password
@@ -111,13 +111,13 @@ final class AuthorizationViewController: UIViewController {
             viewModel.login()
             
         } else {
-            let mail = mainView.getMail()
-            guard mainView.isValidEmail(mail) else {
-                mainView.showError("invalidMail".localized)
+            let email = mainView.getEmail()
+            guard mainView.isValidEmail(email) else {
+                mainView.showError("invalidEmail".localized)
                 return
             }
-            viewModel.mail = mail
-            viewModel.sendCodeToMail()
+            viewModel.email = email
+            viewModel.sendCodeToEmail()
         }
         
     }

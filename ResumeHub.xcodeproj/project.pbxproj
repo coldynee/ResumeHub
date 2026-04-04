@@ -8,6 +8,11 @@
 
 /* Begin PBXBuildFile section */
 		809224B42F7BDE7F00CF238B /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = 809224B32F7BDE7F00CF238B /* SnapKit */; };
+		809224DF2F80B75B00CF238B /* IQKeyboardManagerSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 809224DE2F80B75B00CF238B /* IQKeyboardManagerSwift */; };
+		809224F42F80D6C300CF238B /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 809224F32F80D6C300CF238B /* FirebaseAnalytics */; };
+		809224F62F80D6C300CF238B /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 809224F52F80D6C300CF238B /* FirebaseAuth */; };
+		809224F82F80D6C300CF238B /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 809224F72F80D6C300CF238B /* FirebaseFirestore */; };
+		809224FA2F80D6C300CF238B /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 809224F92F80D6C300CF238B /* FirebaseStorage */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -41,6 +46,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				809224B42F7BDE7F00CF238B /* SnapKit in Frameworks */,
+				809224DF2F80B75B00CF238B /* IQKeyboardManagerSwift in Frameworks */,
+				809224F42F80D6C300CF238B /* FirebaseAnalytics in Frameworks */,
+				809224F82F80D6C300CF238B /* FirebaseFirestore in Frameworks */,
+				809224F62F80D6C300CF238B /* FirebaseAuth in Frameworks */,
+				809224FA2F80D6C300CF238B /* FirebaseStorage in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -84,6 +94,11 @@
 			name = ResumeHub;
 			packageProductDependencies = (
 				809224B32F7BDE7F00CF238B /* SnapKit */,
+				809224DE2F80B75B00CF238B /* IQKeyboardManagerSwift */,
+				809224F32F80D6C300CF238B /* FirebaseAnalytics */,
+				809224F52F80D6C300CF238B /* FirebaseAuth */,
+				809224F72F80D6C300CF238B /* FirebaseFirestore */,
+				809224F92F80D6C300CF238B /* FirebaseStorage */,
 			);
 			productName = ResumeHub;
 			productReference = 80F7E85E2F76F5F500053A4C /* ResumeHub.app */;
@@ -116,6 +131,8 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				809224B22F7BDE7F00CF238B /* XCRemoteSwiftPackageReference "SnapKit" */,
+				809224DD2F80B75B00CF238B /* XCRemoteSwiftPackageReference "IQKeyboardManager" */,
+				809224F22F80D6C300CF238B /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 80F7E85F2F76F5F500053A4C /* Products */;
@@ -373,6 +390,22 @@
 				minimumVersion = 5.6.0;
 			};
 		};
+		809224DD2F80B75B00CF238B /* XCRemoteSwiftPackageReference "IQKeyboardManager" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/hackiftekhar/IQKeyboardManager.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 7.0.0;
+			};
+		};
+		809224F22F80D6C300CF238B /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 12.10.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -380,6 +413,31 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 809224B22F7BDE7F00CF238B /* XCRemoteSwiftPackageReference "SnapKit" */;
 			productName = SnapKit;
+		};
+		809224DE2F80B75B00CF238B /* IQKeyboardManagerSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 809224DD2F80B75B00CF238B /* XCRemoteSwiftPackageReference "IQKeyboardManager" */;
+			productName = IQKeyboardManagerSwift;
+		};
+		809224F32F80D6C300CF238B /* FirebaseAnalytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 809224F22F80D6C300CF238B /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAnalytics;
+		};
+		809224F52F80D6C300CF238B /* FirebaseAuth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 809224F22F80D6C300CF238B /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAuth;
+		};
+		809224F72F80D6C300CF238B /* FirebaseFirestore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 809224F22F80D6C300CF238B /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseFirestore;
+		};
+		809224F92F80D6C300CF238B /* FirebaseStorage */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 809224F22F80D6C300CF238B /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseStorage;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

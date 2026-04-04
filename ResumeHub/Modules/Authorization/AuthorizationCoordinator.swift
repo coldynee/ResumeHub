@@ -40,7 +40,8 @@ final class AuthorizationCoordinator: Coordinator {
             viewModel: viewModel,
             coordinator: self
         )
-        navigationController.setViewControllers([viewController], animated: true)
+        navigationController.setViewControllers([viewController], animated: false)
+        
     }
 }
 
@@ -52,23 +53,13 @@ extension AuthorizationCoordinator: AuthorizationCoordinatorProtocol {
     }
     
     func showRegistration() {
-        // Временно показываем алерт вместо экрана регистрации
-        let alert = UIAlertController(
-            title: "📝 Registration",
-            message: "Registration screen coming soon",
-            preferredStyle: .alert
+    let registrationCoordinator = RegistrationCoordinator(
+        navigationController: navigationController,
+        authService: authService,
+        userManager: userManager
         )
-        alert.addAction(UIAlertAction(title: "OK", style: .default))
-        navigationController.present(alert, animated: true)
-        
-        // Позже раскомментируешь:
-        // let registrationCoordinator = RegistrationCoordinator(
-        //     navigationController: navigationController,
-        //     authService: authService,
-        //     userManager: userManager
-        // )
-        // addChild(registrationCoordinator)
-        // registrationCoordinator.start()
+    addChild(registrationCoordinator)
+    registrationCoordinator.start()
     }
     
     func showForgotPassword() {
@@ -143,5 +134,7 @@ extension AuthorizationCoordinator: AuthorizationCoordinatorProtocol {
     //        addChild(codeVerficationCoordinator)
     //        codeVerficationCoordinator.start()
 
+    
+    
     
 }

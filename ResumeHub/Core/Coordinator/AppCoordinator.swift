@@ -68,7 +68,7 @@ final class AppCoordinator: Coordinator {
         showMainFlow()
     }
     func didLogOut() {
-        userManager.logout()
+        //userManager.logout()
         childCoordinators.removeAll()
         navigationController = UINavigationController()
         showAuthFlow()
