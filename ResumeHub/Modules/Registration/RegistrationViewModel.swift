@@ -7,13 +7,16 @@
 
 import Foundation
 import Combine
-import FirebaseAuth
+import FirebaseFirestore
 
 final class RegistrationViewModel {
     
     //MARK: Dependecies
-    private let authService: AuthServiceProtocol
     private let userManager: UserManagerProtocol
+    private var generatedCode: String?
+    private var codeExpirationDate: Date?
+    private let db = Firestore.firestore()
+    
     
     //MARK: State
     
@@ -22,26 +25,120 @@ final class RegistrationViewModel {
     @Published var registerSuccess = false
     @Published var emailSent = false
     
-    //MARK: Input values
-    
-    var username = ""
-    var email = ""
-    var password = ""
-    
+    @Published var username: String = ""
+    @Published var email: String = ""
+    @Published var password: String = ""
+    @Published var confirmPassword: String = ""
+    @Published var isFormValid: Bool = false
     //MARK: Init
     
-    init(authService: AuthServiceProtocol, userManager: UserManagerProtocol) {
-        self.authService = authService
+    init(userManager: UserManagerProtocol) {
         self.userManager = userManager
     }
     
     //MARK: Public methods
     
+    private func updateFormValidity() {
+        isFormValid = !username.isEmpty && isLoginValid(username)
+            && !email.isEmpty && isEmailValid(email)
+            && !password.isEmpty && isPasswordValid(password) && password == confirmPassword
+        
+    }
+    
+    func updateUsername(_ value: String) {
+        username = value
+        updateFormValidity()
+    }
+
+    func updateEmail(_ value: String) {
+        email = value
+        updateFormValidity()
+    }
+
+    func updatePassword(_ value: String) {
+        password = value
+        updateFormValidity()
+    }
+
+    func updateConfirmPassword(_ value: String) {
+        confirmPassword = value
+        updateFormValidity()
+    }
+    
     func register() {
         isLoading = true
         errorMessage = nil
         
-        Auth.auth().createUser(withEmail: email, password: password) { [weak self] authResult, error in
+        guard !username.isEmpty, !email.isEmpty, !password.isEmpty else {
+            isLoading = false
+            errorMessage = "fillAllFields".localized
+            return
+        }
+        
+        // Проверяем, не занят ли логин или email
+        checkUserExists()
+    }
+    
+    func sendCodeToEmail() {
+        isLoading = true
+        
+        let code = String(format: "%06d", Int.random(in: 0...999999))
+        generatedCode = code
+        codeExpirationDate = Date().addingTimeInterval(15 * 60)
+        
+        print("📧 Код: \(code) на \(email)")
+        
+        EmailService.shared.sendVerificationCode(to: email, code: code) { [weak self] result in
+            DispatchQueue.main.async {
+                self?.isLoading = false
+                
+                switch result {
+                case .success:
+                    self?.emailSent = true
+                case .failure(let error):
+                    self?.errorMessage = "Ошибка отправки: \(error.localizedDescription)"
+                }
+            }
+        }
+    }
+    func verifyCode(_ enteredCode: String) {
+        isLoading = true
+        errorMessage = nil
+        
+        guard let generatedCode = generatedCode,
+              let expirationDate = codeExpirationDate else {
+            isLoading = false
+            errorMessage = "codeNotSent".localized
+            return
+        }
+        
+        guard Date() < expirationDate else {
+            isLoading = false
+            errorMessage = "codeExpired".localized
+            return
+        }
+        
+        guard enteredCode == generatedCode else {
+            isLoading = false
+            errorMessage = "wrongCode".localized
+            return
+        }
+        
+        saveUserToFirestore()
+    }
+    // RegistrationViewModel.swift
+
+    private func saveUserToFirestore() {
+        let userId = UUID().uuidString
+        let userData: [String: Any] = [
+            "uid": userId,
+            "username": username,
+            "email": email,
+            "password": password,
+            "createdAt": FieldValue.serverTimestamp()
+        ]
+        
+        db.collection(FirestoreCollections.users).document(userId).setData(userData) { [weak self] error in
             DispatchQueue.main.async {
                 self?.isLoading = false
                 
@@ -49,76 +146,66 @@ final class RegistrationViewModel {
                     self?.errorMessage = error.localizedDescription
                     return
                 }
-                print(self?.email ?? "", "registered")
+                
+                // ✅ userLogins НЕ НУЖЕН — просто сохраняем пользователя
+                let user = User(id: userId, email: self?.email ?? "", username: self?.username ?? "")
+                self?.userManager.saveUser(user)
                 self?.registerSuccess = true
-                self?.sendCodeToEmail()
             }
-            
-        }
-        
-        
-//        authService.register(username: username, email: email, password: password) { [weak self] result in
-//            DispatchQueue.main.async {
-//                self?.isLoading = false
-//                
-//                switch result {
-//                case .success(let user):
-//                    self?.userManager.saveUser(user)
-//                    self?.registerSuccess = true
-//                case .failure(let error):
-//                    self?.errorMessage = error.localizedDescription
-//                }
-//            }
-//        }
-    }
-    
-    func sendCodeToEmail() {
-//        isLoading = true
-//        errorMessage = nil
-//        print("registered")
-//        authService.sendAuthCode(to: email) { [weak self] result in
-//            DispatchQueue.main.async {
-//                self?.isLoading = false
-//
-//                switch result {
-//                case .success:
-//                    self?.registerSuccess = true
-//                case .failure(let error):
-//                    self?.errorMessage = error.localizedDescription
-//                }
-//            }
-//        }
-        guard let user = Auth.auth().currentUser else { return }
-        
-        user.sendEmailVerification { [weak self] error in
-            DispatchQueue.main.async {
-                if let error = error {
-                    self?.errorMessage = error.localizedDescription
-                    print("error ", error.localizedDescription)
-                } else {
-                    print("letter send to ", self?.email ?? "")
-                    self?.emailSent = true
-                }
-            }
-            
         }
     }
-    func checkEmailVerification() {
-        guard let user = Auth.auth().currentUser else { return }
+    func resendCode() {
+        sendCodeToEmail()
+    }
+    // MARK: - Check User Exists
+    private func checkUserExists() {
         isLoading = true
+        errorMessage = nil
         
-        user.reload { [weak self] error in
-            DispatchQueue.main.async {
+        let usersRef = db.collection(FirestoreCollections.users)
+        
+        // Проверяем логин
+        usersRef.whereField("username", isEqualTo: username).getDocuments { [weak self] snapshot, error in
+            if let error = error {
                 self?.isLoading = false
-                if let error = error {
-                    self?.errorMessage = error.localizedDescription
+                self?.errorMessage = error.localizedDescription
+                return
+            }
+            
+            if let snapshot = snapshot, !snapshot.isEmpty {
+                self?.isLoading = false
+                self?.errorMessage = "Логин уже занят"
+                return
+            }
+            
+            // Проверяем email
+            usersRef.whereField("email", isEqualTo: self?.email ?? "").getDocuments { snapshot, error in
+                if let snapshot = snapshot, !snapshot.isEmpty {
+                    self?.isLoading = false
+                    self?.errorMessage = "Email уже зарегистрирован"
                     return
                 }
-                if user.isEmailVerified {
-                    print("email success")
-                    
-                }
+                
+                // Всё свободно — отправляем код
+                self?.sendCodeToEmail()
             }
         }
+    }
+    func isPasswordValid(_ password: String) -> Bool {
+        let passwordRegex = "[A-Z0-9a-z!_-]{8,}"
+        let passwordPredicate = NSPredicate(format: "SELF MATCHES %@", passwordRegex)
+        return passwordPredicate.evaluate(with: password)
+    }
+
+    func isLoginValid(_ login: String) -> Bool {
+        let loginRegex = "[A-Z0-9a-z]{3,20}"
+        let loginPredicate = NSPredicate(format: "SELF MATCHES %@", loginRegex)
+        return loginPredicate.evaluate(with: login)
+    }
+
+    func isEmailValid(_ email: String) -> Bool {
+        let emailRegex = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,64}"
+        let emailPredicate = NSPredicate(format: "SELF MATCHES %@", emailRegex)
+        return emailPredicate.evaluate(with: email)
     }
 }

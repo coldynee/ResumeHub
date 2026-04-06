@@ -6,10 +6,17 @@
 //
 
 import Foundation
+import FirebaseAuth
 
 struct User: Codable {
-    var id: String
-    var username: String
+    let id: String
     var email: String
-    var password: String
+    var username: String
+    
+    init(id: String, email: String, username: String) {
+        self.id = id
+        self.email = email
+        self.username = username
+    }
+    
 }

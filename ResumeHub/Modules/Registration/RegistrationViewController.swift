@@ -14,7 +14,7 @@ final class RegistrationViewController: UIViewController {
     private let mainView = RegistrationView()
     private let viewModel: RegistrationViewModel
     private let coordinator: RegistrationCoordinatorProtocol
-    private var cancellabels = Set<AnyCancellable>()
+    private var cancellables = Set<AnyCancellable>()
     
     init(viewModel: RegistrationViewModel, coordinator: RegistrationCoordinatorProtocol) {
         self.viewModel = viewModel
@@ -45,19 +45,47 @@ final class RegistrationViewController: UIViewController {
             .sink { [weak self] isLoading in
                 self?.mainView.showLoading(isLoading)
             }
-            .store(in: &cancellabels)
+            .store(in: &cancellables)
         viewModel.$errorMessage
             .receive(on: DispatchQueue.main)
             .sink { [weak self] error in
                 self?.mainView.showError(error)
             }
-            .store(in: &cancellabels)
+            .store(in: &cancellables)
         viewModel.$registerSuccess
             .receive(on: DispatchQueue.main)
             .sink { [weak self] success in
                 if success { self?.coordinator.showMainScreen() }
             }
-            .store(in: &cancellabels)
+            .store(in: &cancellables)
+        viewModel.$emailSent
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] sent in
+                if sent {
+                    self?.showCodeInputAlert()
+                }
+            }
+            .store(in: &cancellables)
+        viewModel.$isFormValid
+                .receive(on: DispatchQueue.main)
+                .sink { [weak self] isValid in
+                    self?.mainView.updateRegisterButtonState()
+                }
+                .store(in: &cancellables)
+        viewModel.$password
+                .combineLatest(viewModel.$confirmPassword)
+                .sink { [weak self] password, confirm in
+                    guard let self = self else { return }
+                    
+                    if !confirm.isEmpty && password != confirm {
+                        self.mainView.showError("passwordsDoNotMatch".localized)
+                    } else if !password.isEmpty && !self.viewModel.isPasswordValid(password) {
+                        self.mainView.showError("passwordTooWeak".localized)
+                    } else {
+                        self.mainView.showError(nil)
+                    }
+                }
+                .store(in: &cancellables)
     }
     
     //MARK: Setup actions
@@ -72,8 +100,12 @@ final class RegistrationViewController: UIViewController {
         mainView.onPasswordChanged = { [weak self] password in
             self?.viewModel.password = password
         }
-        mainView.onConfirmPasswordChanged = { [weak self] password in
-            
+        mainView.onConfirmPasswordChanged = { [weak self] confirmPassword in
+            if let password = self?.viewModel.password, password != confirmPassword {
+                            self?.mainView.showError("passwordsDoNotMatch".localized)
+                        } else {
+                            self?.mainView.showError(nil)
+                        }
         }
         mainView.onRegisterTaped = { [weak self] in
             self?.handleRegister()
@@ -95,6 +127,25 @@ final class RegistrationViewController: UIViewController {
             mainView.showError("fillFields".localized)
             return
         }
+        guard viewModel.isLoginValid(username) else {
+                mainView.showError("invalidLogin".localized)
+                return
+            }
+            
+            guard viewModel.isEmailValid(email) else {
+                mainView.showError("invalidEmail".localized)
+                return
+            }
+            
+            guard viewModel.isPasswordValid(password) else {
+                mainView.showError("passwordTooWeak".localized)
+                return
+            }
+            
+            guard password == confirmPassword else {
+                mainView.showError("passwordsDoNotMatch".localized)
+                return
+            }
         
         viewModel.username = username
         viewModel.email = email
@@ -119,6 +170,30 @@ extension RegistrationViewController {
     private func showAlert(title: String, message: String) {
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "ok".localized, style: .default))
+        present(alert, animated: true)
+    }
+    private func showCodeInputAlert() {
+        let alert = UIAlertController(title: "emailConfirm".localized, message: "\("codeSended".localized) \(viewModel.email) \("inputCodeToRegister".localized)", preferredStyle: .alert)
+        alert.addTextField { textField in
+            textField.placeholder = "emailCode".localized
+            textField.keyboardType = .numberPad
+            textField.font = .systemFont(ofSize: 24, weight: .medium)
+            textField.textAlignment = .center
+        }
+        alert.addAction(UIAlertAction(title: "cancel".localized, style: .cancel) { [weak self] _ in
+            self?.navigationController?.popViewController(animated: true)
+        })
+        alert.addAction(UIAlertAction(title: "confirm".localized, style: .default) { [weak self] _ in
+            guard let code = alert.textFields?.first?.text, !code.isEmpty else {
+                self?.mainView.showError("inputCode".localized)
+                return
+            }
+            self?.viewModel.verifyCode(code)
+        })
+        
+        alert.addAction(UIAlertAction(title: "resentCode".localized, style: .default) { [weak self] _ in
+            self?.viewModel.resendCode()
+        })
         present(alert, animated: true)
     }
 }

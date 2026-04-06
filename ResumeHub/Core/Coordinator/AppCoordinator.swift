@@ -13,13 +13,11 @@ final class AppCoordinator: Coordinator {
     var childCoordinators: [Coordinator] = []
     
     //MARK: Dependencies
-    private let authService: AuthServiceProtocol
     private let userManager: UserManagerProtocol
     
     init(navigationController: UINavigationController) {
         self.navigationController = navigationController
         
-        self.authService = AuthService()
         self.userManager = UserManager()
     }
     
@@ -27,7 +25,6 @@ final class AppCoordinator: Coordinator {
     func start() {
         let launchCoordinator = LaunchCoordinator(
                     navigationController: navigationController,
-                    authService: authService,
                     userManager: userManager
                 )
                 addChild(launchCoordinator)
@@ -38,8 +35,7 @@ final class AppCoordinator: Coordinator {
     //MARK: Flow managment
     private func showAuthFlow() {
         let authCoordinator = AuthorizationCoordinator(navigationController: navigationController,
-                                                       authService: authService,
-                                                       userManager: userManager)
+            userManager: userManager)
         authCoordinator.parentCoordinator = self
         addChild(authCoordinator)
         authCoordinator.start()

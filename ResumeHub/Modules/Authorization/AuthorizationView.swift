@@ -8,11 +8,7 @@
 import UIKit
 import SnapKit
 
-protocol Localizable {
-    var localized: String { get }
-}
-
-extension String: Localizable {
+extension String {
     var localized: String {
         return NSLocalizedString(self, comment: "")
     }
@@ -150,7 +146,7 @@ final class AuthorizationView: UIView {
     private let loginButton: UIButton = {
         let button = UIButton()
         button.setTitle("loginSign".localized, for: .normal)
-        button.setTitleColor(.primaryBlueContent, for: .normal)
+        button.setTitleColor(.primaryBackground, for: .normal)
         button.backgroundColor = .primaryBackgroundInversed
         button.layer.cornerRadius = 20
         button.alpha = 0.4
@@ -313,8 +309,12 @@ final class AuthorizationView: UIView {
         }
         for (index, element) in elements.enumerated() {
             UIView.animate(withDuration: 0.5, delay: 0.1 * Double(index)) {
-                element.alpha = 1
-                element.transform = .identity
+                if index == 6 {
+                    element.alpha = 0.4
+                } else {
+                    element.alpha = 1
+                    element.transform = .identity
+                }
             }
         }
     }
@@ -396,10 +396,10 @@ final class AuthorizationView: UIView {
         passwordTextField.text = nil
         emailTextField.text = nil
         showError(nil)
-        updateLoginButtonState()
+        updateLoginButtonState(isEnabled: false)
     }
-    func updateLoginButtonState() {
-        loginButton.isEnabled = validateFields()
+    func updateLoginButtonState(isEnabled: Bool) {
+        loginButton.isEnabled = isEnabled
         loginButton.alpha = loginButton.isEnabled ? 1: 0.4
     }
     
@@ -410,13 +410,14 @@ final class AuthorizationView: UIView {
         loginTextField.isHidden = !isLoginMode
         emailTextField.isHidden = isLoginMode
         passwordTextField.isHidden = !isLoginMode
-        
-        updateLoginButtonState()
+        let isEnabled = validateFields()
+        updateLoginButtonState(isEnabled: isEnabled)
         onAuthTypeChanged?(isLoginMode)
     }
     
     @objc private func textFieldChanged() {
-        updateLoginButtonState()
+        let isEnabled = validateFields()
+        updateLoginButtonState(isEnabled: isEnabled)
         let isLoginMode = authTypeSegment.selectedSegmentIndex == 0
 
         if isLoginMode {
@@ -463,7 +464,8 @@ extension AuthorizationView: UITextFieldDelegate {
     func textFieldDidEndEditing(_ textField: UITextField) {
         activeTextField = nil
         textField.layer.borderWidth = 0
-        updateLoginButtonState()
+        let isEnabled = validateFields()
+        updateLoginButtonState(isEnabled: isEnabled)
     }
     func textFieldShouldBeginEditing(_ textField: UITextField) -> Bool {
         emailTextField.keyboardType = .emailAddress

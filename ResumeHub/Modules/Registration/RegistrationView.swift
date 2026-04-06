@@ -87,7 +87,7 @@ final class RegistrationView: UIView {
     
     private let passwordTextField: UITextField = {
         var textField = UITextField()
-        textField.placeholder = "password".localized
+        textField.placeholder = "passwordInput".localized
         textField.borderStyle = .roundedRect
         textField.font = UIFont(name: "System", size: 14)
         textField.isSecureTextEntry = true
@@ -123,7 +123,7 @@ final class RegistrationView: UIView {
         var button = UIButton()
         button.setTitle("signUp".localized, for: .normal)
         button.backgroundColor = .primaryBackgroundInversed
-        button.setTitleColor(.primaryBlueContent, for: .normal)
+        button.setTitleColor(.primaryBackground, for: .normal)
         button.layer.cornerRadius = 20
         button.alpha = 0.4
         
@@ -142,7 +142,7 @@ final class RegistrationView: UIView {
                 .foregroundColor: UIColor.primaryBlueContent
             ], range: NSRange (
                 location: "haveAccount".localized.count + 1,
-                length: "login".localized.count
+                length: "loginSign".localized.count
             ))
         button.setAttributedTitle(attributedString, for: .normal)
         
@@ -292,27 +292,12 @@ final class RegistrationView: UIView {
         let passwordText = getPassword()
         let confirmPasswordText = getConfirmPassword()
         
-        guard !loginText.isEmpty, !emailText.isEmpty, !passwordText.isEmpty, !confirmPasswordText.isEmpty else { return false }
+        return !loginText.isEmpty && !emailText.isEmpty && !passwordText.isEmpty && !confirmPasswordText.isEmpty 
         
-        return isValidLogin(loginText) && isValidPassword(passwordText) && isValidEmail(emailText) && passwordText == confirmPasswordText
+        
     }
     
-    func isValidEmail(_ email: String) -> Bool {
-        let emailRegex = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,64}"
-        let emailPredicate = NSPredicate(format: "SELF MATCHES %@", emailRegex)
-        return emailPredicate.evaluate(with: email)
-    }
-    func isValidPassword(_ password: String) -> Bool {
-        let passwordRegex = "[A-Z0-9a-z!_-]{8,}"
-        let passwordPredicate = NSPredicate(format: "SELF MATCHES %@", passwordRegex)
-        return passwordPredicate.evaluate(with: password)
-    }
     
-    func isValidLogin(_ login: String) -> Bool {
-        let loginRegex = "[A-Z0-9a-z]{3,20}"
-        let loginPredicate = NSPredicate(format: "SELF MATCHES %@", loginRegex)
-        return loginPredicate.evaluate(with: login)
-    }
     
     //MARK: Public methods
     

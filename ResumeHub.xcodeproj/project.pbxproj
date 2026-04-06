@@ -13,6 +13,11 @@
 		809224F62F80D6C300CF238B /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 809224F52F80D6C300CF238B /* FirebaseAuth */; };
 		809224F82F80D6C300CF238B /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 809224F72F80D6C300CF238B /* FirebaseFirestore */; };
 		809224FA2F80D6C300CF238B /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 809224F92F80D6C300CF238B /* FirebaseStorage */; };
+		809224FD2F82179800CF238B /* Appwrite in Frameworks */ = {isa = PBXBuildFile; productRef = 809224FC2F82179800CF238B /* Appwrite */; };
+		809225002F821A9D00CF238B /* PocketBase in Frameworks */ = {isa = PBXBuildFile; productRef = 809224FF2F821A9D00CF238B /* PocketBase */; };
+		809225022F821A9D00CF238B /* PocketBaseAdmin in Frameworks */ = {isa = PBXBuildFile; productRef = 809225012F821A9D00CF238B /* PocketBaseAdmin */; };
+		809225042F821A9D00CF238B /* PocketBaseUI in Frameworks */ = {isa = PBXBuildFile; productRef = 809225032F821A9D00CF238B /* PocketBaseUI */; };
+		80BAA3F12F82C5A300B1E58D /* SwiftSMTP in Frameworks */ = {isa = PBXBuildFile; productRef = 80BAA3F02F82C5A300B1E58D /* SwiftSMTP */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -46,8 +51,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				809224B42F7BDE7F00CF238B /* SnapKit in Frameworks */,
+				80BAA3F12F82C5A300B1E58D /* SwiftSMTP in Frameworks */,
+				809225042F821A9D00CF238B /* PocketBaseUI in Frameworks */,
+				809225022F821A9D00CF238B /* PocketBaseAdmin in Frameworks */,
 				809224DF2F80B75B00CF238B /* IQKeyboardManagerSwift in Frameworks */,
 				809224F42F80D6C300CF238B /* FirebaseAnalytics in Frameworks */,
+				809225002F821A9D00CF238B /* PocketBase in Frameworks */,
+				809224FD2F82179800CF238B /* Appwrite in Frameworks */,
 				809224F82F80D6C300CF238B /* FirebaseFirestore in Frameworks */,
 				809224F62F80D6C300CF238B /* FirebaseAuth in Frameworks */,
 				809224FA2F80D6C300CF238B /* FirebaseStorage in Frameworks */,
@@ -99,6 +109,11 @@
 				809224F52F80D6C300CF238B /* FirebaseAuth */,
 				809224F72F80D6C300CF238B /* FirebaseFirestore */,
 				809224F92F80D6C300CF238B /* FirebaseStorage */,
+				809224FC2F82179800CF238B /* Appwrite */,
+				809224FF2F821A9D00CF238B /* PocketBase */,
+				809225012F821A9D00CF238B /* PocketBaseAdmin */,
+				809225032F821A9D00CF238B /* PocketBaseUI */,
+				80BAA3F02F82C5A300B1E58D /* SwiftSMTP */,
 			);
 			productName = ResumeHub;
 			productReference = 80F7E85E2F76F5F500053A4C /* ResumeHub.app */;
@@ -133,6 +148,9 @@
 				809224B22F7BDE7F00CF238B /* XCRemoteSwiftPackageReference "SnapKit" */,
 				809224DD2F80B75B00CF238B /* XCRemoteSwiftPackageReference "IQKeyboardManager" */,
 				809224F22F80D6C300CF238B /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+				809224FB2F82179800CF238B /* XCRemoteSwiftPackageReference "sdk-for-swift" */,
+				809224FE2F821A9D00CF238B /* XCRemoteSwiftPackageReference "PocketBase" */,
+				80BAA3EF2F82C5A300B1E58D /* XCRemoteSwiftPackageReference "Swift-SMTP" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 80F7E85F2F76F5F500053A4C /* Products */;
@@ -180,7 +198,7 @@
 				INFOPLIST_KEY_UIStatusBarStyle = "";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -213,7 +231,7 @@
 				INFOPLIST_KEY_UIStatusBarStyle = "";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -406,6 +424,30 @@
 				minimumVersion = 12.10.0;
 			};
 		};
+		809224FB2F82179800CF238B /* XCRemoteSwiftPackageReference "sdk-for-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/appwrite/sdk-for-swift";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 16.0.0;
+			};
+		};
+		809224FE2F821A9D00CF238B /* XCRemoteSwiftPackageReference "PocketBase" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/briannadoubt/PocketBase.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.5.0;
+			};
+		};
+		80BAA3EF2F82C5A300B1E58D /* XCRemoteSwiftPackageReference "Swift-SMTP" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Kitura/Swift-SMTP.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.1.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -438,6 +480,31 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 809224F22F80D6C300CF238B /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseStorage;
+		};
+		809224FC2F82179800CF238B /* Appwrite */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 809224FB2F82179800CF238B /* XCRemoteSwiftPackageReference "sdk-for-swift" */;
+			productName = Appwrite;
+		};
+		809224FF2F821A9D00CF238B /* PocketBase */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 809224FE2F821A9D00CF238B /* XCRemoteSwiftPackageReference "PocketBase" */;
+			productName = PocketBase;
+		};
+		809225012F821A9D00CF238B /* PocketBaseAdmin */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 809224FE2F821A9D00CF238B /* XCRemoteSwiftPackageReference "PocketBase" */;
+			productName = PocketBaseAdmin;
+		};
+		809225032F821A9D00CF238B /* PocketBaseUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 809224FE2F821A9D00CF238B /* XCRemoteSwiftPackageReference "PocketBase" */;
+			productName = PocketBaseUI;
+		};
+		80BAA3F02F82C5A300B1E58D /* SwiftSMTP */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 80BAA3EF2F82C5A300B1E58D /* XCRemoteSwiftPackageReference "Swift-SMTP" */;
+			productName = SwiftSMTP;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

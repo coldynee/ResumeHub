@@ -7,12 +7,12 @@
 
 import Foundation
 import UIKit
+import FirebaseFirestore
 
 protocol AuthorizationCoordinatorProtocol: AnyObject {
     func showMainScreen()
     func showRegistration()
-    func showForgotPassword()
-    func showCodeVerification(email: String)
+    func showForgotPassword(textFromTextField: String)
 }
 
 final class AuthorizationCoordinator: Coordinator {
@@ -22,18 +22,15 @@ final class AuthorizationCoordinator: Coordinator {
     var childCoordinators: [Coordinator] = []
     weak var parentCoordinator: AppCoordinator?
     
-    private let authService: AuthServiceProtocol
     private let userManager: UserManagerProtocol
     
-    init(navigationController: UINavigationController, authService: AuthServiceProtocol, userManager: UserManagerProtocol) {
+    init(navigationController: UINavigationController, userManager: UserManagerProtocol) {
         self.navigationController = navigationController
-        self.authService = authService
         self.userManager = userManager
     }
     
     func start() {
         let viewModel = AuthorizationViewModel(
-            authService: authService,
             userManager: userManager
         )
         let viewController = AuthorizationViewController(
@@ -53,88 +50,98 @@ extension AuthorizationCoordinator: AuthorizationCoordinatorProtocol {
     }
     
     func showRegistration() {
-    let registrationCoordinator = RegistrationCoordinator(
-        navigationController: navigationController,
-        authService: authService,
-        userManager: userManager
+        let registrationCoordinator = RegistrationCoordinator(
+            navigationController: navigationController,
+            userManager: userManager
         )
-    addChild(registrationCoordinator)
-    registrationCoordinator.start()
+        addChild(registrationCoordinator)
+        registrationCoordinator.start()
     }
     
-    func showForgotPassword() {
+    func showForgotPassword(textFromTextField: String) {
         let alert = UIAlertController(
-            title: "🔐 Forgot Password",
-            message: "Enter your email to receive reset instructions",
+            title: "forgotPassword".localized,
+            message: "inputLogin".localized,
             preferredStyle: .alert
         )
         
         alert.addTextField { textField in
-            textField.placeholder = "email".localized
-            textField.keyboardType = .emailAddress
+            textField.placeholder = "login".localized
+            textField.text = textFromTextField
+            textField.autocapitalizationType = .none
         }
         
-        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
-        alert.addAction(UIAlertAction(title: "Send", style: .default) { [weak self] _ in
-            if let email = alert.textFields?.first?.text, !email.isEmpty {
-                let successAlert = UIAlertController(
-                    title: "Email Sent",
-                    message: "Reset link sent to \(email)",
-                    preferredStyle: .alert
-                )
-                successAlert.addAction(UIAlertAction(title: "OK", style: .default))
-                self?.navigationController.present(successAlert, animated: true)
+        alert.addAction(UIAlertAction(title: "cancel".localized, style: .cancel))
+        let sendAction = UIAlertAction(title: "send".localized, style: .default) { [weak self] _ in
+            guard let loginName = alert.textFields?.first?.text, !loginName.isEmpty else {
+                self?.showErrorAlert(message: "inputLogin".localized)
+                return
             }
-        })
+            self?.sendPasswordReset(loginName: loginName)
+        }
+        alert.addAction(sendAction)
         
         navigationController.present(alert, animated: true)
         
-        //        let forgotCoordinator = ForgotPasswordCoordinator(
-        //            navigationController: navigationController,
-        //            authService: authService
-        //        )
-        //        addChild(forgotCoordinator)
-        //        forgotCoordinator.start()
     }
     
-    func showCodeVerification(email: String) {
-        let alert = UIAlertController(
-            title: "Verification",
-            message: "Enter the code sent to \(email)",
-            preferredStyle: .alert
-        )
+    func sendPasswordReset(loginName: String) {
+        let db = Firestore.firestore()
         
-        alert.addTextField { textField in
-            textField.placeholder = "code".localized
-            textField.keyboardType = .numberPad
-        }
-        
-        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
-        alert.addAction(UIAlertAction(title: "Verify", style: .default) { _ in
-            if let code = alert.textFields?.first?.text, !code.isEmpty {
-                let successAlert = UIAlertController(
-                    title: "Success",
-                    message: "Code verified!",
-                    preferredStyle: .alert
-                )
-                successAlert.addAction(UIAlertAction(title: "OK", style: .default))
-                self.navigationController.present(successAlert, animated: true)
+        db.collection(FirestoreCollections.users).whereField("username", isEqualTo: loginName).getDocuments { [weak self] snapshot, error in
+            if let error = error {
+                self?.showErrorAlert(message: error.localizedDescription)
+                return
             }
-        })
-        
-        navigationController.present(alert, animated: true)
+            guard let document = snapshot?.documents.first, let email = document.data()["email"] as? String else {
+                self?.showErrorAlert(message: "userNotFound".localized)
+                return
+            }
+            let userId = document.documentID
+            let newPassword = self?.generateRandomPassword() ?? "12345678"
+            
+            db.collection(FirestoreCollections.users).document(userId).updateData([
+                "password": newPassword
+            ]) { error in
+                if let error = error {
+                    self?.showErrorAlert(message: error.localizedDescription)
+                    return
+                }
+                self?.sendNewPasswordToEmail(email: email, newPassword: newPassword)
+            }
+            
+        }
+    }
+    private func generateRandomPassword() -> String {
+        let letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+        return String((0..<10).map { _ in letters.randomElement()! })
     }
     
-    
-    //        let codeVerficationCoordinator = CodeVerificationCoordinator(
-    //            navigationController = navigationController,
-    //            authService: authService,
-    //            email: email
-    //        )
-    //        addChild(codeVerficationCoordinator)
-    //        codeVerficationCoordinator.start()
+    private func sendNewPasswordToEmail(email: String, newPassword: String) {
+        
+        // Отправляем письмо через EmailService
+        EmailService.shared.sendCustomEmail(to: email, newPassword: newPassword) { [weak self] result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success:
+                    self?.showSuccessAlert(email: email)
+                case .failure(let error):
+                    self?.showErrorAlert(message: error.localizedDescription)
+                }
+            }
+        }
+    }
 
+    func showErrorAlert(message: String) {
+        let alert = UIAlertController(title: "error".localized, message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .default))
+        navigationController.present(alert, animated: true)
+    }
     
-    
+    func showSuccessAlert(email: String) {
+        let alert = UIAlertController(title: "success".localized, message: String(format: "resetPasswordSent".localized, email), preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .default))
+        navigationController.present(alert, animated: true)
+    }
     
 }

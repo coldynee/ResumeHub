@@ -15,7 +15,7 @@ final class AuthorizationViewController: UIViewController {
     private let mainView = AuthorizationView()
     private let viewModel: AuthorizationViewModel
     private let coordinator: AuthorizationCoordinatorProtocol
-    private var cancellabels = Set<AnyCancellable>()
+    private var cancellables = Set<AnyCancellable>()
     
     init(viewModel: AuthorizationViewModel, coordinator: AuthorizationCoordinatorProtocol) {
         self.viewModel = viewModel
@@ -47,13 +47,13 @@ final class AuthorizationViewController: UIViewController {
             .sink { [weak self] isLoading in
                 self?.mainView.showLoading(isLoading)
             }
-            .store(in: &cancellabels)
+            .store(in: &cancellables)
         viewModel.$errorMessage
             .receive(on: DispatchQueue.main)
             .sink { [weak self] error in
                 self?.mainView.showError(error)
             }
-            .store(in: &cancellabels)
+            .store(in: &cancellables)
         viewModel.$loginSuccess
             .receive(on: DispatchQueue.main)
             .sink { [weak self] success in
@@ -61,7 +61,21 @@ final class AuthorizationViewController: UIViewController {
                     self?.coordinator.showMainScreen()
                 }
             }
-            .store(in: &cancellabels)
+            .store(in: &cancellables)
+        viewModel.$emailSent
+                    .receive(on: DispatchQueue.main)
+                    .sink { [weak self] sent in
+                        if sent {
+                            self?.showCodeInputAlert()
+                        }
+                    }
+                    .store(in: &cancellables)
+        viewModel.$isFormValid
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] isValid in
+                self?.mainView.updateLoginButtonState(isEnabled: isValid)
+            }
+            .store(in: &cancellables)
     }
 
     //MARK: Setup actions
@@ -70,13 +84,13 @@ final class AuthorizationViewController: UIViewController {
             self?.viewModel.updateAuthMode(isLoginMode: isLoginMode)
         }
         mainView.onLoginChanged = { [weak self] username in
-            self?.viewModel.username = username
+            self?.viewModel.updateUsername(username)
         }
         mainView.onEmailChanged = { [weak self] email in
-            self?.viewModel.email = email
+            self?.viewModel.updateEmail(email)
         }
         mainView.onPasswordChanged = { [weak self] password in
-            self?.viewModel.password = password
+            self?.viewModel.updatePassword(password)
         }
         
         mainView.onSignInButtonTaped = { [weak self] in
@@ -84,17 +98,19 @@ final class AuthorizationViewController: UIViewController {
         }
         
         mainView.onForgotPasswordTaped = { [weak self] in
-            self?.coordinator.showForgotPassword()
+            self?.coordinator.showForgotPassword(textFromTextField: self?.viewModel.username ?? "")
         }
         
         mainView.onRegisterTaped = { [weak self] in
             self?.coordinator.showRegistration()
         }
+        
     }
     
     //MARK: Navigation setup
-
+    
     private func handleSignIn() {
+        
         let isLoginMode = mainView.getAuthType()
         
         if isLoginMode {
@@ -108,7 +124,7 @@ final class AuthorizationViewController: UIViewController {
             
             viewModel.username = username
             viewModel.password = password
-            viewModel.login()
+            viewModel.loginWithPassword()
             
         } else {
             let email = mainView.getEmail()
@@ -133,8 +149,38 @@ final class AuthorizationViewController: UIViewController {
 
 extension AuthorizationViewController {
     private func showAlert(title: String, message: String) {
-            let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
-            alert.addAction(UIAlertAction(title: "ok".localized, style: .default))
-            present(alert, animated: true)
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "ok".localized, style: .default))
+        present(alert, animated: true)
+    }
+    private func showCodeInputAlert() {
+        let alert = UIAlertController(
+            title: "verifyCode".localized,
+            message: "codeSended".localized + " \(viewModel.email)",
+            preferredStyle: .alert
+        )
+        
+        alert.addTextField { textField in
+            textField.placeholder = "emailCode".localized
+            textField.keyboardType = .numberPad
+            textField.font = .systemFont(ofSize: 20, weight: .medium)
+            textField.textAlignment = .center
         }
+        
+        alert.addAction(UIAlertAction(title: "cancel".localized, style: .cancel))
+        alert.addAction(UIAlertAction(title: "confirm".localized, style: .default) { [weak self] _ in
+            guard let code = alert.textFields?.first?.text, !code.isEmpty else {
+                self?.mainView.showError("emailCode".localized)
+                return
+            }
+            self?.viewModel.verifyCodeAndLogin(code)
+        })
+        
+        alert.addAction(UIAlertAction(title: "resentCode".localized, style: .default) { [weak self] _ in
+            self?.viewModel.sendCodeToEmail()
+        })
+        
+        present(alert, animated: true)
+    }
+
 }

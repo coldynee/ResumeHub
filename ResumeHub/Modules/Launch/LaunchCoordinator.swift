@@ -16,14 +16,11 @@ final class LaunchCoordinator: Coordinator, LaunchCoordinatorProtocol {
     var navigationController: UINavigationController
     var childCoordinators: [Coordinator] = []
     
-    private let authService: AuthServiceProtocol
     private let userManager: UserManagerProtocol
     
     init(navigationController: UINavigationController,
-         authService: AuthServiceProtocol,
          userManager: UserManagerProtocol) {
         self.navigationController = navigationController
-        self.authService = authService
         self.userManager = userManager
     }
     
@@ -44,7 +41,6 @@ final class LaunchCoordinator: Coordinator, LaunchCoordinatorProtocol {
     private func showAuthScreen() {
         let authCoordinator = AuthorizationCoordinator(
             navigationController: navigationController,
-            authService: authService,
             userManager: userManager
         )
         addChild(authCoordinator)
@@ -55,7 +51,6 @@ final class LaunchCoordinator: Coordinator, LaunchCoordinatorProtocol {
         print("logged from user defaults")
         let authCoordinator = AuthorizationCoordinator(
             navigationController: navigationController,
-            authService: authService,
             userManager: userManager
         )
         addChild(authCoordinator)

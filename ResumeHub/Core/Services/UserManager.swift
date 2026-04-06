@@ -17,7 +17,7 @@ protocol UserManagerProtocol {
 final class UserManager: UserManagerProtocol {
     
     private let userDefaults = UserDefaults.standard
-    private let userKey = "currentUser"
+    private let userKey = UserDefaultsKeys.currentUser
     
     var isLoggedIn: Bool {
         return currentUser != nil
@@ -30,6 +30,7 @@ final class UserManager: UserManagerProtocol {
     
     func saveUser(_ user: User) {
         if let data = try? JSONEncoder().encode(user) {
+            print("LOGINED ")
             userDefaults.set(data, forKey: userKey)
         }
     }
