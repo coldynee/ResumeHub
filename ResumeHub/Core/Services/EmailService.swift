@@ -27,7 +27,7 @@ final class EmailService {
         let tlsOptions = NWProtocolTLS.Options()
         let parameters = NWParameters(tls: tlsOptions)
         parameters.allowLocalEndpointReuse = true
-        let port = NWEndpoint.Port(rawValue: smtpPort) ?? ""
+        let port = NWEndpoint.Port(rawValue: smtpPort)
         let connection = NWConnection(
             host: NWEndpoint.Host(smtpHost),
             port: NWEndpoint.Port(rawValue: smtpPort)!,
