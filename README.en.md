@@ -1,6 +1,13 @@
 <div align="center">
 
-# ResumeHub
+# 📱 ResumeHub
+
+**Platform for publishing resumes and job search**
+
+[![Swift](https://img.shields.io/badge/Swift-5.9-orange?style=for-the-badge&logo=swift&logoColor=white)](https://swift.org)
+[![Platform](https://img.shields.io/badge/iOS-15.0+-blue?style=for-the-badge&logo=ios&logoColor=white)](https://apple.com)
+[![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
+[![Last commit](https://img.shields.io/github/last-commit/coldynee/ResumeHub?style=for-the-badge)](https://github.com/coldynee/ResumeHub/commits/main)
 
 <div align="center">
   <b>
@@ -9,161 +16,111 @@
   </b>
 </div>
 
-<br>
+</div>
 
-**Platform for publishing resumes and job search**
+---
 
-[![Swift](https://img.shields.io/badge/Swift-5.9-orange)](https://swift.org)
-[![Platform](https://img.shields.io/badge/Platform-iOS-blue)](https://apple.com)
-[![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
-[![Last commit](https://img.shields.io/github/last-commit/coldynee/ResumeHub)](https://github.com/coldynee/ResumeHub/commits/main)
+## ✨ About the project
+
+**ResumeHub** is an iOS application that I am developing to demonstrate the skills required for a Junior iOS Developer. The project includes a complete authentication cycle, cloud database integration, and email notifications.
+
+### Key Features
+
+<div align="center">
+
+| | |
+|---|---|
+| 🔐 **Registration & Login** | Two methods: username/password + one‑time code via email |
+| 🔄 **Password Recovery** | Automatic generation of a new password and sending via SMTP |
+| ☁️ **Data Storage** | Users and resumes in **Firebase Firestore** |
+| ✉️ **Email Notifications** | Custom **SMTP client** (no third‑party SDKs) |
+| 🎬 **Animation** | Custom animated Launch Screen |
+| 🌍 **Localization** | Russian and English interface |
+| 🌓 **Themes** | Full support for light and dark themes |
 
 </div>
 
 ---
 
-## About the project
+## 🛠 Technologies
 
-**ResumeHub** is an iOS application I'm developing to demonstrate the skills required for a Junior iOS Developer. The project includes a complete authentication cycle, cloud database integration, and email notifications.
-
-### Key Features
-
-- Registration and login: support for two methods — username/password and one-time code via email
-- Password recovery: automatic generation of a new password and sending via SMTP
-- User data storage in **Firebase Firestore**
-- Email sending via custom **SMTP client** (no third-party SDKs)
-- Animated Launch Screen
-- Localization (Russian / English)
-- Light and dark theme support
-
----
-
-## Technologies
-
-| Area | Technologies |
-|------|--------------|
-| **Language** | Swift 5 |
-| **UI** | UIKit, SnapKit, Auto Layout |
-| **Architecture** | MVVM, Coordinator |
-| **Reactivity** | Combine |
-| **Backend & DB** | Firebase Firestore |
-| **Network & Email** | URLSession, SMTP (custom implementation) |
-| **Tools** | Git, SPM |
+<p align="center">
+  <img src="https://img.shields.io/badge/Swift-FA7343?style=for-the-badge&logo=swift&logoColor=white" />
+  <img src="https://img.shields.io/badge/UIKit-2396F3?style=for-the-badge&logo=uikit&logoColor=white" />
+  <img src="https://img.shields.io/badge/SnapKit-FF9E0F?style=for-the-badge&logo=snapkit&logoColor=white" />
+  <img src="https://img.shields.io/badge/Combine-FF4785?style=for-the-badge&logo=combine&logoColor=white" />
+  <img src="https://img.shields.io/badge/MVVM-007AFF?style=for-the-badge&logo=databricks&logoColor=white" />
+  <img src="https://img.shields.io/badge/Coordinator-4B0082?style=for-the-badge&logo=databricks&logoColor=white" />
+  <img src="https://img.shields.io/badge/Firebase-FFCA28?style=for-the-badge&logo=firebase&logoColor=black" />
+  <img src="https://img.shields.io/badge/Git-F05032?style=for-the-badge&logo=git&logoColor=white" />
+</p>
 
 ---
 
-## Launch Screen Animation
+## 🎬 Launch Screen Animation
 
-<table>
-  <tr>
-    <th align="center">Light Theme</th>
-    <th align="center">Dark Theme</th>
-  </tr>
-  <tr>
-    <td align="center"><img src="Screenshots/Light/LaunchScreen.gif" width="300"/></td>
-    <td align="center"><img src="Screenshots/Dark/LaunchScreen.gif" width="300"/></td>
-  </tr>
-</table>
+<div align="center">
 
-<br/>
+| Light Theme | Dark Theme |
+|:------------:|:-----------:|
+| <img src="Screenshots/Light/LaunchScreen.gif" width="300"/> | <img src="Screenshots/Dark/LaunchScreen.gif" width="300"/> |
+
+</div>
 
 ---
 
-## Screenshots
+## 📱 Screenshots
 
-### Login Authentication Screen
+<div align="center">
 
-<table>
-  <tr>
-    <th align="center">Light Theme</th>
-    <th align="center">Dark Theme</th>
-  </tr>
-  <tr>
-    <td align="center"><img src="Screenshots/Light/LoginAuth.png" width="300"/></td>
-    <td align="center"><img src="Screenshots/Dark/LoginAuth.png" width="300"/></td>
-  </tr>
-  
-</table>
+### 🔐 Login Authentication Screen
 
-<br/>
+| Light Theme | Dark Theme |
+|:------------:|:-----------:|
+| <img src="Screenshots/Light/LoginAuth.png" width="300"/> | <img src="Screenshots/Dark/LoginAuth.png" width="300"/> |
 
-### Email Authentication Screen
+### 📧 Email Authentication Screen
 
-<table>
-  <tr>
-    <th align="center">Light Theme</th>
-    <th align="center">Dark Theme</th>
-  </tr>
-  <tr>
-    <td align="center"><img src="Screenshots/Light/EmailAuth.png" width="300"/></td>
-    <td align="center"><img src="Screenshots/Dark/EmailAuth.png" width="300"/></td>
-  </tr>
-  
-</table>
+| Light Theme | Dark Theme |
+|:------------:|:-----------:|
+| <img src="Screenshots/Light/EmailAuth.png" width="300"/> | <img src="Screenshots/Dark/EmailAuth.png" width="300"/> |
 
-<br/>
+### 📝 Registration Screen
 
-### Registration Screen
+| Light Theme | Dark Theme |
+|:------------:|:-----------:|
+| <img src="Screenshots/Light/Registration.png" width="300"/> | <img src="Screenshots/Dark/Registration.png" width="300"/> |
 
-<table>
-  <tr>
-    <th align="center">Light Theme</th>
-    <th align="center">Dark Theme</th>
-  </tr>
-  <tr>
-    <td align="center"><img src="Screenshots/Light/Registration.png" width="300"/></td>
-    <td align="center"><img src="Screenshots/Dark/Registration.png" width="300"/></td>
-  </tr>
-  
-</tr>
+### ✉️ Code Entry Form
 
-<br/>
+| Light Theme | Dark Theme |
+|:------------:|:-----------:|
+| <img src="Screenshots/Light/CodeForm.png" width="300"/> | <img src="Screenshots/Dark/CodeForm.png" width="300"/> |
 
-### Code Entry Form
+### 🔓 Forgot Password Form
 
-<table>
-  <tr>
-    <th align="center">Light Theme</th>
-    <th align="center">Dark Theme</th>
-  </tr>
-  <tr>
-    <td align="center"><img src="Screenshots/Light/CodeForm.png" width="300"/></td>
-    <td align="center"><img src="Screenshots/Dark/CodeForm.png" width="300"/></td>
-  </tr>
-  
-</table>
+| Light Theme | Dark Theme |
+|:------------:|:-----------:|
+| <img src="Screenshots/Light/ForgotPassword.png" width="300"/> | <img src="Screenshots/Dark/ForgotPassword.png" width="300"/> |
 
-<br/>
-
-### Forgot Password Form
-
-<table>
-  <tr>
-    <th align="center">Light Theme</th>
-    <th align="center">Dark Theme</th>
-  </tr>
-  <tr>
-    <td align="center"><img src="Screenshots/Light/ForgotPassword.png" width="300"/></td>
-    <td align="center"><img src="Screenshots/Dark/ForgotPassword.png" width="300"/></td>
-  </tr>
-  
-</table>
-
-<br/>
+</div>
 
 ---
 
-## Project Architecture
+## 🧠 Architecture
 
 The project is built on **MVVM + Coordinator**:
-- **View** — display only (code-based layout using SnapKit)
-- **ViewModel** — business logic, validation, service calls
-- **Coordinator** — all navigation
-- **Combine** — View and ViewModel binding
+
+| Component | Role |
+|-----------|------|
+| **View** | Display only (code‑based layout using SnapKit) |
+| **ViewModel** | Business logic, validation, service calls |
+| **Coordinator** | All navigation |
+| **Combine** | View – ViewModel binding |
 
 ---
 
-## Development Roadmap
+## 🚀 Roadmap
 
 The project is actively evolving. Planned for the near future:
 
@@ -184,7 +141,7 @@ The project is actively evolving. Planned for the near future:
 
 ---
 
-## How to Run
+## 🚀 How to Run
 
 1. Clone the repository  
    `git clone https://github.com/coldynee/ResumeHub.git`
@@ -193,11 +150,19 @@ The project is actively evolving. Planned for the near future:
 
 ---
 
-## Contacts
+## 📫 Contacts
 
-- Telegram: [@coldynee](https://t.me/coldynee)
-- Email: [coldynee@gmail.com](mailto:coldynee@gmail.com)
-- GitHub: [coldynee](https://github.com/coldynee)
+<p align="center">
+  <a href="https://t.me/coldynee">
+    <img src="https://img.shields.io/badge/Telegram-26A5E4?style=for-the-badge&logo=telegram&logoColor=white" />
+  </a>
+  <a href="mailto:coldynee@gmail.com">
+    <img src="https://img.shields.io/badge/Email-EA4335?style=for-the-badge&logo=gmail&logoColor=white" />
+  </a>
+  <a href="https://github.com/coldynee">
+    <img src="https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white" />
+  </a>
+</p>
 
 ---
 
