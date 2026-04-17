@@ -1,6 +1,13 @@
 <div align="center">
 
-# ResumeHub
+# 📱 ResumeHub
+
+**Платформа для публикации резюме и поиска работы**
+
+[![Swift](https://img.shields.io/badge/Swift-5.9-orange?style=for-the-badge&logo=swift&logoColor=white)](https://swift.org)
+[![Platform](https://img.shields.io/badge/iOS-15.0+-blue?style=for-the-badge&logo=ios&logoColor=white)](https://apple.com)
+[![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
+[![Last commit](https://img.shields.io/github/last-commit/coldynee/ResumeHub?style=for-the-badge)](https://github.com/coldynee/ResumeHub/commits/main)
 
 <div align="center">
   <b>
@@ -9,160 +16,111 @@
   </b>
 </div>
 
-<br>
-
-**Платформа для публикации резюме и поиска работы**
-
-[![Swift](https://img.shields.io/badge/Swift-5.9-orange)](https://swift.org)
-[![Platform](https://img.shields.io/badge/Platform-iOS-blue)](https://apple.com)
-[![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
-[![Last commit](https://img.shields.io/github/last-commit/coldynee/ResumeHub)](https://github.com/coldynee/ResumeHub/commits/main)
-
 </div>
 
 ---
 
-## О проекте
+## ✨ О проекте
 
 **ResumeHub** — это iOS-приложение, которое я разрабатываю для демонстрации навыков, необходимых Junior iOS-разработчику. Проект включает полный цикл аутентификации, работу с облачной базой данных и отправку email-уведомлений.
 
 ### Ключевые возможности
 
-- Регистрация и вход: поддержка двух методов — логин/пароль и вход по одноразовому коду на email
-- Восстановление пароля: автоматическая генерация нового пароля и отправка через SMTP
-- Хранение пользователей в **Firebase Firestore**
-- Отправка email через собственный **SMTP-клиент** (без сторонних SDK)
-- Анимированный экран загрузки (Launch Screen)
-- Локализация (русский / английский)
-- Поддержка светлой и темной тем
+<div align="center">
+
+| | |
+|---|---|
+| 🔐 **Регистрация и вход** | Два метода: логин/пароль + одноразовый код на email |
+| 🔄 **Восстановление пароля** | Автоматическая генерация нового пароля и отправка через SMTP |
+| ☁️ **Хранение данных** | Пользователи и резюме в **Firebase Firestore** |
+| ✉️ **Email-уведомления** | Собственный **SMTP-клиент** (без сторонних SDK) |
+| 🎬 **Анимация** | Кастомный анимированный Launch Screen |
+| 🌍 **Локализация** | Русский и английский интерфейс |
+| 🌓 **Темы** | Полная поддержка светлой и тёмной темы |
+
+</div>
 
 ---
 
-## Технологии
+## 🛠 Технологии
 
-| Область | Технологии |
-|---------|-------------|
-| **Язык** | Swift 5 |
-| **UI** | UIKit, SnapKit, Auto Layout |
-| **Архитектура** | MVVM, Coordinator |
-| **Реактивность** | Combine |
-| **Бэкенд и БД** | Firebase Firestore |
-| **Сеть и почта** | URLSession, SMTP (собственная реализация) |
-| **Инструменты** | Git, SPM |
-
----
-
-## Анимация Launch Screen
-<table>
-  <tr>
-    <th align="center">Светлая тема</th>
-    <th align="center">Тёмная тема</th>
-  </tr>
-  <tr>
-    <td align="center"><img src="Screenshots/Light/LaunchScreen.gif" width="300"/></td>
-    <td align="center"><img src="Screenshots/Dark/LaunchScreen.gif" width="300"/></td>
-  </tr>
-</table>
-
-<br/>
+<p align="center">
+  <img src="https://img.shields.io/badge/Swift-FA7343?style=for-the-badge&logo=swift&logoColor=white" />
+  <img src="https://img.shields.io/badge/UIKit-2396F3?style=for-the-badge&logo=uikit&logoColor=white" />
+  <img src="https://img.shields.io/badge/SnapKit-FF9E0F?style=for-the-badge&logo=snapkit&logoColor=white" />
+  <img src="https://img.shields.io/badge/Combine-FF4785?style=for-the-badge&logo=combine&logoColor=white" />
+  <img src="https://img.shields.io/badge/MVVM-007AFF?style=for-the-badge&logo=databricks&logoColor=white" />
+  <img src="https://img.shields.io/badge/Coordinator-4B0082?style=for-the-badge&logo=databricks&logoColor=white" />
+  <img src="https://img.shields.io/badge/Firebase-FFCA28?style-for-the-badge&logo=firebase&logoColor=black" />
+  <img src="https://img.shields.io/badge/Git-F05032?style=for-the-badge&logo=git&logoColor=white" />
+</p>
 
 ---
 
-## Скриншоты
+## 🎬 Анимация Launch Screen
 
-### Экран авторизации по логину
+<div align="center">
 
-<table>
-  <tr>
-    <th align="center">Светлая тема</th>
-    <th align="center">Тёмная тема</th>
-  </tr>
-  <tr>
-    <td align="center"><img src="Screenshots/Light/LoginAuth.png" width="300"/></td>
-    <td align="center"><img src="Screenshots/Dark/LoginAuth.png" width="300"/></td>
-  </tr>
-  
-</table>
+| Светлая тема | Тёмная тема |
+|:------------:|:-----------:|
+| <img src="Screenshots/Light/LaunchScreen.gif" width="300"/> | <img src="Screenshots/Dark/LaunchScreen.gif" width="300"/> |
 
-<br/>
-
-### Экран авторизации по почте
-
-<table>
-  <tr>
-    <th align="center">Светлая тема</th>
-    <th align="center">Тёмная тема</th>
-  </tr>
-  <tr>
-    <td align="center"><img src="Screenshots/Light/EmailAuth.png" width="300"/></td>
-    <td align="center"><img src="Screenshots/Dark/EmailAuth.png" width="300"/></td>
-  </tr>
-  
-</table>
-
-<br/>
-
-### Экран регистрации
-
-<table>
-  <tr>
-    <th align="center">Светлая тема</th>
-    <th align="center">Тёмная тема</th>
-  </tr>
-  <tr>
-    <td align="center"><img src="Screenshots/Light/Registration.png" width="300"/></td>
-    <td align="center"><img src="Screenshots/Dark/Registration.png" width="300"/></td>
-  </tr>
-  
-</table>
-
-<br/>
-
-### Форма ввода кода с почты
-
-<table>
-  <tr>
-    <th align="center">Светлая тема</th>
-    <th align="center">Тёмная тема</th>
-  </tr>
-  <tr>
-    <td align="center"><img src="Screenshots/Light/CodeForm.png" width="300"/></td>
-    <td align="center"><img src="Screenshots/Dark/CodeForm.png" width="300"/></td>
-  </tr>
-  
-</table>
-
-<br/>
-
-### Форма ввода почты для восстановления доступа
-
-<table>
-  <tr>
-    <th align="center">Светлая тема</th>
-    <th align="center">Тёмная тема</th>
-  </tr>
-  <tr>
-    <td align="center"><img src="Screenshots/Light/ForgotPassword.png" width="300"/></td>
-    <td align="center"><img src="Screenshots/Dark/ForgotPassword.png" width="300"/></td>
-  </tr>
-  
-</table>
-
-<br/>
+</div>
 
 ---
 
-## Архитектура проекта
+## 📱 Скриншоты
+
+<div align="center">
+
+### 🔐 Экран авторизации по логину
+
+| Светлая тема | Тёмная тема |
+|:------------:|:-----------:|
+| <img src="Screenshots/Light/LoginAuth.png" width="300"/> | <img src="Screenshots/Dark/LoginAuth.png" width="300"/> |
+
+### 📧 Экран авторизации по почте
+
+| Светлая тема | Тёмная тема |
+|:------------:|:-----------:|
+| <img src="Screenshots/Light/EmailAuth.png" width="300"/> | <img src="Screenshots/Dark/EmailAuth.png" width="300"/> |
+
+### 📝 Экран регистрации
+
+| Светлая тема | Тёмная тема |
+|:------------:|:-----------:|
+| <img src="Screenshots/Light/Registration.png" width="300"/> | <img src="Screenshots/Dark/Registration.png" width="300"/> |
+
+### ✉️ Форма ввода кода
+
+| Светлая тема | Тёмная тема |
+|:------------:|:-----------:|
+| <img src="Screenshots/Light/CodeForm.png" width="300"/> | <img src="Screenshots/Dark/CodeForm.png" width="300"/> |
+
+### 🔓 Форма восстановления пароля
+
+| Светлая тема | Тёмная тема |
+|:------------:|:-----------:|
+| <img src="Screenshots/Light/ForgotPassword.png" width="300"/> | <img src="Screenshots/Dark/ForgotPassword.png" width="300"/> |
+
+</div>
+
+---
+
+## 🧠 Архитектура
 
 Проект построен на **MVVM + Coordinator**:
-- **View** — только отображение (вёрстка кодом через SnapKit)
-- **ViewModel** — бизнес-логика, валидация, вызовы сервисов
-- **Coordinator** — вся навигация
-- **Combine** — связывание View и ViewModel
+
+| Компонент | Роль |
+|-----------|------|
+| **View** | Только отображение (вёрстка кодом через SnapKit) |
+| **ViewModel** | Бизнес-логика, валидация, вызовы сервисов |
+| **Coordinator** | Вся навигация |
+| **Combine** | Связывание View и ViewModel |
 
 ---
 
-## Планы по развитию
+## 🚀 Планы по развитию
 
 Проект активно развивается. В ближайшее время планирую:
 
@@ -183,7 +141,7 @@
 
 ---
 
-## Как запустить
+## 🚀 Как запустить
 
 1. Клонировать репозиторий  
    `git clone https://github.com/coldynee/ResumeHub.git`
@@ -192,11 +150,19 @@
 
 ---
 
-## Контакты
+## 📫 Контакты
 
-- Telegram: [@coldynee](https://t.me/coldynee)
-- Email: [coldynee@gmail.com](mailto:coldynee@gmail.com)
-- GitHub: [coldynee](https://github.com/coldynee)
+<p align="center">
+  <a href="https://t.me/coldynee">
+    <img src="https://img.shields.io/badge/Telegram-26A5E4?style=for-the-badge&logo=telegram&logoColor=white" />
+  </a>
+  <a href="mailto:coldynee@gmail.com">
+    <img src="https://img.shields.io/badge/Email-EA4335?style=for-the-badge&logo=gmail&logoColor=white" />
+  </a>
+  <a href="https://github.com/coldynee">
+    <img src="https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white" />
+  </a>
+</p>
 
 ---
 
