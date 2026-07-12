@@ -57,6 +57,7 @@ final class AuthorizationViewController: UIViewController {
         viewModel.$loginSuccess
             .receive(on: DispatchQueue.main)
             .sink { [weak self] success in
+                print("🔔 loginSuccess = \(success)")
                 if success {
                     self?.coordinator.showMainScreen()
                 }

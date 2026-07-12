@@ -24,14 +24,29 @@ final class UserManager: UserManagerProtocol {
     }
     
     var currentUser: User? {
-        guard let data = userDefaults.data(forKey: userKey) else { return nil }
-        return try? JSONDecoder().decode(User.self, from: data)
+        guard let data = userDefaults.data(forKey: userKey) else {
+            print("❌ UserManager: нет данных в UserDefaults")
+            return nil
+        }
+        do {
+            let user = try JSONDecoder().decode(User.self, from: data)
+            print("✅ UserManager: загружен пользователь \(user.username)")
+            return user
+        } catch {
+            print("❌ UserManager: не удалось декодировать User — \(error)")
+            userDefaults.removeObject(forKey: userKey)
+            return nil
+        }
     }
     
     func saveUser(_ user: User) {
         if let data = try? JSONEncoder().encode(user) {
             print("LOGINED ")
             userDefaults.set(data, forKey: userKey)
+            print("✅ UserManager сохранён: \(user.username) для uid \(user.id)")
+        } else {
+            print("❌ UserManager: не удалось сохранить")
+
         }
     }
     

@@ -126,7 +126,6 @@ final class RegistrationViewModel {
         
         saveUserToFirestore()
     }
-    // RegistrationViewModel.swift
 
     private func saveUserToFirestore() {
         let userId = UUID().uuidString
@@ -135,7 +134,9 @@ final class RegistrationViewModel {
             "username": username,
             "email": email,
             "password": password,
+            "isApplicant": true,
             "createdAt": FieldValue.serverTimestamp()
+            
         ]
         
         db.collection(FirestoreCollections.users).document(userId).setData(userData) { [weak self] error in
@@ -147,8 +148,14 @@ final class RegistrationViewModel {
                     return
                 }
                 
-                // ✅ userLogins НЕ НУЖЕН — просто сохраняем пользователя
-                let user = User(id: userId, email: self?.email ?? "", username: self?.username ?? "")
+                let user = User(
+                    id: userId,
+                    email: self?.email ?? "",
+                    username: self?.username ?? "",
+                    firstName: nil,
+                    lastName: nil,
+                    isApplicant: true
+                )
                 self?.userManager.saveUser(user)
                 self?.registerSuccess = true
             }

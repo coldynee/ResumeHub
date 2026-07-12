@@ -24,11 +24,12 @@ final class AppCoordinator: Coordinator {
     //MARK: Start
     func start() {
         let launchCoordinator = LaunchCoordinator(
-                    navigationController: navigationController,
-                    userManager: userManager
-                )
-                addChild(launchCoordinator)
-                launchCoordinator.start()
+            navigationController: navigationController,
+            userManager: userManager
+        )
+        launchCoordinator.parentCoordinator = self
+        addChild(launchCoordinator)
+        launchCoordinator.start()
         
     }
     
@@ -42,29 +43,32 @@ final class AppCoordinator: Coordinator {
     }
     private func showMainFlow() {
         // Временно показываем алерт вместо главного экрана
-            let alert = UIAlertController(
-                title: "Success",
-                message: "Logged in successfully!",
-                preferredStyle: .alert
-            )
-            alert.addAction(UIAlertAction(title: "OK", style: .default))
-            navigationController.present(alert, animated: true)
+//            let alert = UIAlertController(
+//                title: "Success",
+//                message: "Logged in successfully!",
+//                preferredStyle: .alert
+//            )
+//            alert.addAction(UIAlertAction(title: "OK", style: .default))
+//            navigationController.present(alert, animated: true)
             
-            // Позже раскомментируешь:
-            // let mainCoordinator = MainTabBarCoordinator(
-            //     navigationController: navigationController,
-            //     userManager: userManager)
-            // addChild(mainCoordinator)
-            // mainCoordinator.start()
+        print("🏠 showMainFlow вызван")
+
+             let mainCoordinator = MainTabBarCoordinator(
+                 navigationController: navigationController,
+                 userManager: userManager)
+             addChild(mainCoordinator)
+             mainCoordinator.start()
     }
     
     //MARK: Public methods
     func didFinishAuth() {
+        print("✅ didFinishAuth вызван")
+
         childCoordinators.removeAll()
         showMainFlow()
     }
     func didLogOut() {
-        //userManager.logout()
+        userManager.logout()
         childCoordinators.removeAll()
         navigationController = UINavigationController()
         showAuthFlow()

@@ -46,6 +46,8 @@ final class AuthorizationCoordinator: Coordinator {
 
 extension AuthorizationCoordinator: AuthorizationCoordinatorProtocol {
     func showMainScreen() {
+        print("🏠 showMainScreen вызван")
+        print("parentCoordinator = \(parentCoordinator != nil ? "✅ есть" : "❌ nil")")
         parentCoordinator?.didFinishAuth()
     }
     

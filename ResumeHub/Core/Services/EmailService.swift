@@ -23,7 +23,6 @@ final class EmailService {
         """
         let queue = DispatchQueue(label: "smtp.queue")
         
-        // ✅ Используем TLS параметры для защищённого соединения
         let tlsOptions = NWProtocolTLS.Options()
         let parameters = NWParameters(tls: tlsOptions)
         parameters.allowLocalEndpointReuse = true

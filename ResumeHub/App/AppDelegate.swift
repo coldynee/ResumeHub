@@ -21,7 +21,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         IQKeyboardManager.shared.resignOnTouchOutside = true
         IQKeyboardManager.shared.toolbarConfiguration.tintColor = .primaryBlueContent
         FirebaseApp.configure()
-        
+
         return true
     }
 
