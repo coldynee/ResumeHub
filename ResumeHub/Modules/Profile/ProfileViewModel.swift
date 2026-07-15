@@ -20,6 +20,7 @@ final class ProfileViewModel {
     
     func loadProfile() {
         user = userManager.currentUser
+        print("👤 ProfileViewModel загружен: \(user?.username ?? "nil"), avatarURL: \(user?.avatarURL ?? "nil")")
     }
     
     func logout() {

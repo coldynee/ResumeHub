@@ -11,7 +11,7 @@ import SnapKit
 
 final class ProfileViewController: UIViewController {
     
-    private let viewModel: ProfileViewModel
+    let viewModel: ProfileViewModel
     private let coordinator: ProfileCoordinatorProtocol
     private var cancellabes = Set<AnyCancellable>()
     
@@ -185,7 +185,7 @@ final class ProfileViewController: UIViewController {
     }
     
     @objc private func settignsTapped() {
-        
+        coordinator.showSettings()
     }
     
     @objc private func logoutTapped() {
@@ -199,6 +199,9 @@ final class ProfileViewController: UIViewController {
                 guard let user = user else { return }
                 self?.nameLabel.text = user.fullName
                 self?.emailLabel.text = user.email
+                print("👤 user загружен: \(user.username), avatarURL: \(user.avatarURL ?? "nil")")
+
+                self?.loadAvatar(from: user.avatarURL)
             }
             .store(in: &cancellabes)
     }
@@ -207,9 +210,35 @@ final class ProfileViewController: UIViewController {
         let alert = UIAlertController(title: "logout".localized, message: "logoutConfirmation".localized, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "cancel".localized, style: .cancel))
         alert.addAction(UIAlertAction(title: "logout".localized, style: .destructive) { [weak self] _ in
+            print("🔴 Нажата кнопка Logout")
             self?.viewModel.logout()
             self?.coordinator.didLogout()
         })
         present(alert, animated: true)
+    }
+    
+    private func loadAvatar(from url: String?) {
+        print("🖼️ loadAvatar вызван с url: \(url ?? "nil")")
+
+        guard let urlString = url, let url = URL(string: urlString) else {
+            print("❌ Неверный URL или nil, ставим заглушку")
+
+            avatarImageView.image = UIImage(systemName: "person.circle.fill")
+            avatarImageView.tintColor = .systemGray3
+            return
+        }
+        print("🖼️ Загружаем аватар по URL: \(urlString)")
+
+        URLSession.shared.dataTask(with: url) { [weak self] data, _, _ in
+            DispatchQueue.main.async {
+                if let data = data, let image = UIImage(data: data) {
+                    self?.avatarImageView.image = image
+                    self?.avatarImageView.contentMode = .scaleAspectFill
+                } else {
+                    self?.avatarImageView.image = UIImage(systemName: "person.circle.fill")
+                                    self?.avatarImageView.tintColor = .systemGray3
+                }
+            }
+        }.resume()
     }
 }

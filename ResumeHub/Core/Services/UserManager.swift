@@ -40,9 +40,13 @@ final class UserManager: UserManagerProtocol {
     }
     
     func saveUser(_ user: User) {
+        print("📀 saveUser вызван с avatarURL: \(user.avatarURL ?? "nil")")
+
         if let data = try? JSONEncoder().encode(user) {
             print("LOGINED ")
             userDefaults.set(data, forKey: userKey)
+            print("👤 Сохраняем пользователя: \(user.username), avatarURL: \(user.avatarURL ?? "nil")")
+
             print("✅ UserManager сохранён: \(user.username) для uid \(user.id)")
         } else {
             print("❌ UserManager: не удалось сохранить")

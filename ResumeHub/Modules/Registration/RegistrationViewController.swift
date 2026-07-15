@@ -180,9 +180,7 @@ extension RegistrationViewController {
             textField.font = .systemFont(ofSize: 24, weight: .medium)
             textField.textAlignment = .center
         }
-        alert.addAction(UIAlertAction(title: "cancel".localized, style: .cancel) { [weak self] _ in
-            self?.navigationController?.popViewController(animated: true)
-        })
+        alert.addAction(UIAlertAction(title: "cancel".localized, style: .cancel))
         alert.addAction(UIAlertAction(title: "confirm".localized, style: .default) { [weak self] _ in
             guard let code = alert.textFields?.first?.text, !code.isEmpty else {
                 self?.mainView.showError("inputCode".localized)

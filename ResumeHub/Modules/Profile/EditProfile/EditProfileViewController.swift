@@ -8,6 +8,7 @@
 import UIKit
 import Combine
 import SnapKit
+import PhotosUI
 
 class EditProfileViewController: UIViewController {
 
@@ -15,16 +16,23 @@ class EditProfileViewController: UIViewController {
     private let coordinator: EditProfileCoordinatorProtocol
     private var cancellables = Set<AnyCancellable>()
     
+    private var toastView: UIView?
+    private var toastHeightConstraint: Constraint?
+    
     private var hasChanges: Bool {
         guard let user = viewModel.user else { return false }
         
         let newIsApplicant = userTypeSegmentControl.selectedSegmentIndex == 0
+        let isAvatarChanged = viewModel.isAvatarChanged
+        let isPasswordChanged = !(newPasswordTextField.text?.isEmpty ?? true)
         
         return (firstNameTextField.text ?? "") != (user.firstName ?? "") ||
                (lastNameTextField.text ?? "") != (user.lastName ?? "") ||
                (userNameTextField.text ?? "") != user.username ||
                (emailTextField.text ?? "") != user.email ||
-               newIsApplicant != user.isApplicant
+               newIsApplicant != user.isApplicant ||
+               isAvatarChanged ||
+                isPasswordChanged
     }
     
     private let scrollView: UIScrollView = {
@@ -106,6 +114,25 @@ class EditProfileViewController: UIViewController {
         return textField
     }()
     
+    private let emailInfoButton: UIButton = {
+        let button = UIButton(type: .custom)
+        let config = UIImage.SymbolConfiguration(pointSize: 18, weight: .light)
+        button.setImage(UIImage(systemName: "questionmark.circle", withConfiguration: config), for: .normal)
+        button.tintColor = .secondaryLabel
+        button.isUserInteractionEnabled = true
+        
+        return button
+    }()
+    
+    private let newPasswordTextField: UITextField = {
+        let textField = UITextField()
+        textField.placeholder = "newPassword".localized
+        textField.borderStyle = .roundedRect
+        textField.font = .systemFont(ofSize: 16)
+        textField.isSecureTextEntry = true
+        return textField
+    }()
+    
     private let userTypeSegmentControl: UISegmentedControl = {
         let segment = UISegmentedControl(items: ["applicant".localized, "employer".localized])
         segment.selectedSegmentIndex = 0
@@ -165,7 +192,7 @@ class EditProfileViewController: UIViewController {
         view.addSubview(scrollView)
         scrollView.addSubview(contentView)
         
-        [avatarImageView, changePhotoLabel, userNameTextField, firstNameTextField, lastNameTextField, emailTextField, userTypeSegmentControl, saveButton] .forEach {
+        [avatarImageView, changePhotoLabel, userNameTextField, firstNameTextField, lastNameTextField, emailTextField, emailInfoButton,newPasswordTextField, userTypeSegmentControl, saveButton] .forEach {
             contentView.addSubview($0)
         }
         
@@ -217,8 +244,21 @@ class EditProfileViewController: UIViewController {
             make.height.equalTo(50)
         }
         
-        userTypeSegmentControl.snp.makeConstraints { make in
+        emailInfoButton.snp.makeConstraints { make in
+            make.centerY.equalTo(emailTextField)
+            make.trailing.equalTo(emailTextField.snp.trailing).inset(8)
+            make.size.equalTo(24)
+        }
+        
+        newPasswordTextField.snp.makeConstraints { make in
             make.top.equalTo(emailTextField.snp.bottom).offset(16)
+            make.leading.trailing.equalToSuperview().inset(24)
+            make.height.equalTo(50)
+        }
+
+        // Обнови userTypeSegmentControl
+        userTypeSegmentControl.snp.makeConstraints { make in
+            make.top.equalTo(newPasswordTextField.snp.bottom).offset(24)
             make.leading.trailing.equalToSuperview().inset(24)
             make.height.equalTo(36)
         }
@@ -240,6 +280,8 @@ class EditProfileViewController: UIViewController {
         firstNameTextField.addTarget(self, action: #selector(textFieldChanged), for: .editingChanged)
         lastNameTextField.addTarget(self, action: #selector(textFieldChanged), for: .editingChanged)
         emailTextField.addTarget(self, action: #selector(textFieldChanged), for: .editingChanged)
+        emailInfoButton.addTarget(self, action: #selector(emailInfoTapped), for: .touchUpInside)
+        newPasswordTextField.addTarget(self, action: #selector(textFieldChanged), for: .editingChanged)
         userTypeSegmentControl.addTarget(self, action: #selector(textFieldChanged), for: .valueChanged)
         saveButton.addTarget(self, action: #selector(saveTapped), for: .touchUpInside)
         
@@ -260,6 +302,7 @@ class EditProfileViewController: UIViewController {
                 self?.userNameTextField.text = user.username
                 self?.emailTextField.text = user.email
                 self?.userTypeSegmentControl.selectedSegmentIndex = user.isApplicant ? 0 : 1
+                self?.loadAvatar(from: user.avatarURL)
             }
             .store(in: &cancellables)
         viewModel.$isSaving
@@ -304,9 +347,20 @@ class EditProfileViewController: UIViewController {
         let currentEmail = viewModel.user?.email ?? ""
         let isEmailChanged = newEmail != currentEmail && !newEmail.isEmpty
         
+        let newPassword = newPasswordTextField.text ?? ""
+        let isPasswordChanged = !newPassword.isEmpty
+        
         let isApplicant = userTypeSegmentControl.selectedSegmentIndex == 0
         
-        if isEmailChanged {
+        if isEmailChanged || isPasswordChanged {
+            if isPasswordChanged {
+                        guard newPassword.count >= 8 else {
+                            showErrorAlert(message: "passwordTooShort".localized)
+                            return
+                        }
+                        viewModel.newPassword = newPassword
+                    }
+            
                 viewModel.newEmail = newEmail
                 viewModel.sendVerificationCode(to: currentEmail)
                 showVerificationAlert()
@@ -318,12 +372,42 @@ class EditProfileViewController: UIViewController {
             lastName: lastNameTextField.text ?? "",
             isApplicant: isApplicant
         )
-        coordinator.dismiss()
-        
     }
     
     @objc private func avatarTapped() {
+        let alert = UIAlertController(title: "changePhoto".localized, message: nil, preferredStyle: .actionSheet)
         
+        alert.addAction(UIAlertAction(title: "chooseFromGallery".localized, style: .default) { [weak self] _ in
+            self?.openGallery()
+        })
+        
+        alert.addAction(UIAlertAction(title: "takePhoto".localized, style: .default) { [weak self] _ in
+            self?.openCamera()
+        })
+        
+        alert.addAction(UIAlertAction(title: "cancel".localized, style: .cancel))
+        
+        present(alert, animated: true)
+    }
+    
+    private func openGallery() {
+        let picker = UIImagePickerController()
+        picker.sourceType = .photoLibrary
+        picker.delegate = self
+        picker.allowsEditing = true
+        present(picker, animated: true)
+    }
+    
+    private func openCamera() {
+        guard UIImagePickerController.isSourceTypeAvailable(.camera) else {
+            showErrorAlert(message: "cameraNotAvaliable".localized)
+            return
+        }
+        let picker = UIImagePickerController()
+        picker.sourceType = .camera
+        picker.delegate = self
+        picker.allowsEditing = true
+        present(picker, animated: true)
     }
     
     private func updateSaveButtonState() {
@@ -334,6 +418,7 @@ class EditProfileViewController: UIViewController {
             }
 
             let isUsernameValid = !(userNameTextField.text?.isEmpty ?? true)
+        let isPasswordValid = newPasswordTextField.isHidden || (newPasswordTextField.text?.count ?? 0) >= 8
             saveButton.isEnabled = hasChanges && isUsernameValid
             saveButton.alpha = saveButton.isEnabled ? 1 : 0.6
     }
@@ -392,5 +477,134 @@ class EditProfileViewController: UIViewController {
                 })
         
         present(alert, animated: true)
+    }
+    
+    private func showToast(message: String) {
+        hideToast()
+            
+            // Создаём контейнер
+            let container = UIView()
+            container.backgroundColor = .systemBackground
+            container.layer.cornerRadius = 12
+            container.layer.shadowColor = UIColor.black.cgColor
+            container.layer.shadowOpacity = 0.1
+            container.layer.shadowOffset = CGSize(width: 0, height: 2)
+            container.layer.shadowRadius = 8
+            container.clipsToBounds = false
+            container.alpha = 0
+            view.addSubview(container)
+            toastView = container
+            
+            // Иконка
+            let icon = UIImageView()
+            icon.image = UIImage(systemName: "exclamationmark.triangle.fill")
+            icon.tintColor = .systemOrange
+            container.addSubview(icon)
+            
+            // Текст
+            let label = UILabel()
+            label.text = message
+            label.font = .systemFont(ofSize: 14, weight: .medium)
+            label.textColor = .label
+            label.numberOfLines = 0
+            container.addSubview(label)
+            
+            // Кнопка закрытия
+            let closeButton = UIButton(type: .system)
+            closeButton.setImage(UIImage(systemName: "xmark"), for: .normal)
+            closeButton.tintColor = .secondaryLabel
+            closeButton.addTarget(self, action: #selector(hideToast), for: .touchUpInside)
+            container.addSubview(closeButton)
+            
+            // Constraints
+            container.snp.makeConstraints { make in
+                make.top.equalTo(emailTextField.snp.bottom).offset(12)
+                make.leading.trailing.equalTo(emailTextField)
+                self.toastHeightConstraint = make.height.equalTo(50).constraint
+            }
+            
+            icon.snp.makeConstraints { make in
+                make.leading.equalToSuperview().offset(16)
+                make.centerY.equalToSuperview()
+                make.size.equalTo(20)
+            }
+            
+            label.snp.makeConstraints { make in
+                make.leading.equalTo(icon.snp.trailing).offset(12)
+                make.trailing.equalTo(closeButton.snp.leading).offset(-8)
+                make.centerY.equalToSuperview()
+            }
+            
+            closeButton.snp.makeConstraints { make in
+                make.trailing.equalToSuperview().offset(-12)
+                make.centerY.equalToSuperview()
+                make.size.equalTo(24)
+            }
+            
+            // Анимация появления
+            container.transform = CGAffineTransform(translationX: 0, y: -10)
+            UIView.animate(withDuration: 0.3, delay: 0, usingSpringWithDamping: 0.8, initialSpringVelocity: 0.5) {
+                container.alpha = 1
+                container.transform = .identity
+            }
+            
+            // Автоматическое исчезновение через 4 секунды
+            DispatchQueue.main.asyncAfter(deadline: .now() + 4) { [weak self] in
+                self?.hideToast()
+            }
+    }
+    
+    @objc private func emailInfoTapped() {
+        showToast(message: "emailChangeWarningMessage".localized)
+    }
+    
+    @objc private func hideToast() {
+        guard let container = toastView else { return }
+        UIView.animate(withDuration: 0.3) {
+            container.alpha = 0
+            container.transform = CGAffineTransform(translationX: 0, y: -10)
+        } completion: { _ in
+            container.removeFromSuperview()
+            self.toastView = nil
+        }
+    }
+    
+    private func loadAvatar(from url: String?) {
+        guard let urlString = url, let url = URL(string: urlString) else {
+            avatarImageView.image = UIImage(systemName: "person.circle.fill")
+            avatarImageView.tintColor = .systemGray3
+            return
+        }
+        
+        URLSession.shared.dataTask(with: url) { [weak self] data, _, _ in
+            DispatchQueue.main.async {
+                if let data = data, let image = UIImage(data: data) {
+                    self?.avatarImageView.image = image
+                    self?.avatarImageView.contentMode = .scaleAspectFill
+                } else {
+                    self?.avatarImageView.image = UIImage(systemName: "person.circle.fill")
+                    self?.avatarImageView.tintColor = .systemGray3
+                }
+            }
+        }.resume()
+    }
+}
+
+extension EditProfileViewController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+        picker.dismiss(animated: true)
+        
+        guard let image = info[.editedImage] as? UIImage ?? info[.originalImage] as? UIImage else { return }
+        
+        avatarImageView.image = image
+        avatarImageView.contentMode = .scaleAspectFill
+        
+        viewModel.selectedImage = image
+        viewModel.isAvatarChanged = true
+        
+        updateSaveButtonState()
+    }
+    func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+        picker.dismiss(animated: true)
     }
 }

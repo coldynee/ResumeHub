@@ -14,6 +14,7 @@ struct User: Codable {
     var firstName: String?
     var lastName: String?
     var isApplicant: Bool
+    var avatarURL: String?
     
     var fullName: String {
         if let firstName = firstName, let lastName = lastName {
@@ -27,13 +28,14 @@ struct User: Codable {
         }
     }
     
-    init(id: String, email: String, username: String, firstName: String? = nil, lastName: String? = nil, isApplicant: Bool = true) {
+    init(id: String, email: String, username: String, firstName: String? = nil, lastName: String? = nil, isApplicant: Bool = true, avatarURL: String? =  nil) {
         self.id = id
         self.email = email
         self.username = username
         self.firstName = firstName
         self.lastName = lastName
         self.isApplicant = isApplicant
+        self.avatarURL = avatarURL
         }
     
 }

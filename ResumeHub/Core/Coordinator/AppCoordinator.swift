@@ -56,6 +56,7 @@ final class AppCoordinator: Coordinator {
              let mainCoordinator = MainTabBarCoordinator(
                  navigationController: navigationController,
                  userManager: userManager)
+        mainCoordinator.parentCoordinator = self
              addChild(mainCoordinator)
              mainCoordinator.start()
     }
@@ -68,10 +69,25 @@ final class AppCoordinator: Coordinator {
         showMainFlow()
     }
     func didLogOut() {
-        userManager.logout()
-        childCoordinators.removeAll()
-        navigationController = UINavigationController()
-        showAuthFlow()
+        print("🔄 AppCoordinator.didLogOut() вызван")
+            userManager.logout()
+            childCoordinators.removeAll()
+            
+            // Создаём новый navigationController
+            let newNav = UINavigationController()
+            navigationController = newNav
+            
+            // ✅ Обновляем window.rootViewController
+            if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+               let window = windowScene.windows.first(where: { $0.isKeyWindow }) {
+                print("✅ Обновляем window.rootViewController")
+                window.rootViewController = newNav
+                window.makeKeyAndVisible()
+            } else {
+                print("❌ Не удалось найти window")
+            }
+            
+            showAuthFlow()
     }
     
 }

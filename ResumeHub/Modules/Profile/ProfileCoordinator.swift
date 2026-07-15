@@ -11,6 +11,7 @@ import UIKit
 protocol ProfileCoordinatorProtocol: AnyObject {
     func didLogout()
     func showEditProfile()
+    func showSettings()
 }
 
 final class ProfileCoordinator: Coordinator {
@@ -39,12 +40,36 @@ final class ProfileCoordinator: Coordinator {
 
 extension ProfileCoordinator: ProfileCoordinatorProtocol {
     func showEditProfile() {
-        let editCoordinator = EditProfileCoordinator(navigationController: navigationController, userManager: userManager)
-        addChild(editCoordinator)
-        editCoordinator.start()
+        let editCoordinator = EditProfileCoordinator(
+                navigationController: navigationController,
+                userManager: userManager
+            )
+            editCoordinator.parentCoordinator = self
+            editCoordinator.onDismiss = { [weak self] in
+                // Принудительно обновляем профиль
+                if let profileVC = self?.navigationController.viewControllers.first as? ProfileViewController {
+                    profileVC.viewModel.loadProfile()
+                }
+            }
+            addChild(editCoordinator)
+            editCoordinator.start()
     }
     
     func didLogout() {
+        print("🔄 ProfileCoordinator.didLogout() вызван")
+            print("parentCoordinator = \(parentCoordinator != nil ? "✅ есть" : "❌ nil")")
+        childCoordinators.removeAll()
         parentCoordinator?.didLogout()
     }
+    
+    func showSettings() {
+        let settingsCoordinator = SettingsCoordinator(
+            navigationController: navigationController,
+            userManager: userManager
+        )
+        settingsCoordinator.parentCoordinator = self
+        addChild(settingsCoordinator)
+        settingsCoordinator.start()
+    }
+    
 }

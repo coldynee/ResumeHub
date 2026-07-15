@@ -56,6 +56,7 @@ extension AuthorizationCoordinator: AuthorizationCoordinatorProtocol {
             navigationController: navigationController,
             userManager: userManager
         )
+        registrationCoordinator.parentCoordinator = parentCoordinator
         addChild(registrationCoordinator)
         registrationCoordinator.start()
     }

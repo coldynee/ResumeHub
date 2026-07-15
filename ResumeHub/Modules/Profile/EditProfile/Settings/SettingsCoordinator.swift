@@ -1,21 +1,18 @@
 //
-//  EditProfileCoordinator.swift
+//  SettingsCoordinator.swift
 //  ResumeHub
 //
-//  Created by Никита Морозов on 12.07.2026.
+//  Created by Никита Морозов on 15.07.2026.
 //
 
 import Foundation
 import UIKit
 
-protocol EditProfileCoordinatorProtocol: AnyObject {
+protocol SettingsCoordinatorProtocol: AnyObject {
     func dismiss()
 }
 
-class EditProfileCoordinator: Coordinator {
-    
-    var onDismiss: (() -> Void)?
-
+final class SettingsCoordinator: Coordinator {
     
     var navigationController: UINavigationController
     
@@ -31,18 +28,15 @@ class EditProfileCoordinator: Coordinator {
     }
     
     func start() {
-        let viewModel = EditProfileViewModel(userManager: userManager)
-        let viewContorller = EditProfileViewController(viewModel: viewModel, coordinator: self)
-        navigationController.pushViewController(viewContorller, animated: true)
+        let viewController = SettingsViewController(userManager: userManager, coordinator: self)
+        navigationController.pushViewController(viewController, animated: true)
     }
-    
     
 }
 
-extension EditProfileCoordinator: EditProfileCoordinatorProtocol {
+extension SettingsCoordinator: SettingsCoordinatorProtocol {
     func dismiss() {
         navigationController.popViewController(animated: true)
         parentCoordinator?.removeChild(self)
-        onDismiss?()
     }
 }

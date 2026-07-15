@@ -8,7 +8,7 @@
 import Foundation
 import UIKit
 
-protocol MainTabBarCoordinatorProtocol: AnyObject {
+protocol MainTabBarCoordinatorProtocol: Coordinator {
     func didLogout()
 }
 
@@ -52,6 +52,12 @@ class MainTabBarCoordinator: Coordinator {
         favoritesCoordinator.start()
         favoritesCoordinator.navigationController.tabBarItem = UITabBarItem(title: "favorites".localized, image: UIImage(systemName: "heart"), selectedImage: UIImage(systemName: "heart.fill"))
         
+        let createCoordinator = CreateCoordinator(navigationController: UINavigationController(), userManager: userManager)
+        createCoordinator.parentCoordinator = self
+        addChild(createCoordinator)
+        createCoordinator.start()
+        createCoordinator.navigationController.tabBarItem = UITabBarItem(title: "create".localized, image: UIImage(systemName: "plus.circle"), selectedImage: UIImage(systemName: "plus.circle.fill"))
+        
         let chatCoordinator = ChatCoordinator(navigationController: UINavigationController(), userManager: userManager)
         chatCoordinator.parentCoordinator = self
         addChild(chatCoordinator)
@@ -64,12 +70,13 @@ class MainTabBarCoordinator: Coordinator {
         profileCoordinator.start()
         profileCoordinator.navigationController.tabBarItem = UITabBarItem(title: "profile".localized, image: UIImage(systemName: "person"), selectedImage: UIImage(systemName: "person.fill"))
         
-        tabBarController.viewControllers = [feedCoordinator.navigationController, favoritesCoordinator.navigationController, chatCoordinator.navigationController, profileCoordinator.navigationController]
+        tabBarController.viewControllers = [feedCoordinator.navigationController, favoritesCoordinator.navigationController, createCoordinator.navigationController, chatCoordinator.navigationController, profileCoordinator.navigationController]
     }
 }
 
 extension MainTabBarCoordinator: MainTabBarCoordinatorProtocol {
     func didLogout() {
+        print("🔄 MainTabBarCoordinator.didLogout() вызван")
         childCoordinators.removeAll()
         parentCoordinator?.didLogOut()
     }
