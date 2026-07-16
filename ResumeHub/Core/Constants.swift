@@ -10,6 +10,7 @@
     enum FirestoreCollections {
         static let users = "users"
         static let resumes = "resumes"
+        static let vacancies = "vacancies"
     }
 
     enum EmailConfig {
@@ -26,4 +27,5 @@
 
     enum NotificationNames {
         static let signInLinkReceived = Notification.Name("SignInLinkReceived")
+        static let userProfileUpdated = Notification.Name("userProfileUpdated")
     }

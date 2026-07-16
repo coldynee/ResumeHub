@@ -12,6 +12,7 @@ protocol ProfileCoordinatorProtocol: AnyObject {
     func didLogout()
     func showEditProfile()
     func showSettings()
+    func showMyItems()
 }
 
 final class ProfileCoordinator: Coordinator {
@@ -70,6 +71,16 @@ extension ProfileCoordinator: ProfileCoordinatorProtocol {
         settingsCoordinator.parentCoordinator = self
         addChild(settingsCoordinator)
         settingsCoordinator.start()
+    }
+    
+    func showMyItems() {
+        let myItemsCoordinator = MyItemsCoordinator(
+            navigationController: navigationController,
+            userManager: userManager
+        )
+        myItemsCoordinator.parentCoordinator = self
+        addChild(myItemsCoordinator)
+        myItemsCoordinator.start()
     }
     
 }

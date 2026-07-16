@@ -10,6 +10,7 @@ import UIKit
 
 protocol MainTabBarCoordinatorProtocol: Coordinator {
     func didLogout()
+    func removeChild(_ coordinator: Coordinator)
 }
 
 class MainTabBarCoordinator: Coordinator {
@@ -79,5 +80,9 @@ extension MainTabBarCoordinator: MainTabBarCoordinatorProtocol {
         print("🔄 MainTabBarCoordinator.didLogout() вызван")
         childCoordinators.removeAll()
         parentCoordinator?.didLogOut()
+    }
+    
+    func removeChild(_ coordinator: Coordinator) {
+        childCoordinators = childCoordinators.filter { $0 !== coordinator }
     }
 }

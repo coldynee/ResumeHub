@@ -22,68 +22,48 @@ class CreateCoordinator: Coordinator {
     init(navigationController: UINavigationController, userManager: UserManagerProtocol) {
         self.navigationController = navigationController
         self.userManager = userManager
+        
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(profileUpdated),
+            name: NotificationNames.userProfileUpdated,
+            object: nil
+        )
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
     }
     
     func start() {
+        showAppropriateScreen()
+    }
+    
+    private func showAppropriateScreen() {
         guard let user = userManager.currentUser else {
-                    // Если пользователь не найден — показываем ошибку
-                    let vc = UIViewController()
-                    vc.view.backgroundColor = .systemBackground
-                    navigationController.setViewControllers([vc], animated: false)
-                    return
-                }
-                
-        user.isApplicant ? showResumeCreation() : showVacancyCreation()
-    }
-    
-    private func showResumeCreation() {
-        let vc = UIViewController()
-            vc.view.backgroundColor = .systemBackground
-            vc.title = "createResume".localized
-            
-            
-            let label = UILabel()
-            label.text = "📄 Создание резюме\n(скоро)"
-            label.numberOfLines = 0
-            label.textAlignment = .center
-            label.font = .systemFont(ofSize: 24, weight: .medium)
-            label.textColor = .secondaryLabel
-            label.translatesAutoresizingMaskIntoConstraints = false
-            vc.view.addSubview(label)
-            
-            NSLayoutConstraint.activate([
-                label.centerXAnchor.constraint(equalTo: vc.view.centerXAnchor),
-                label.centerYAnchor.constraint(equalTo: vc.view.centerYAnchor)
-            ])
-            
-            navigationController.setViewControllers([vc], animated: false)
-    }
-   
-    
-    private func showVacancyCreation() {
-            // TODO: Открыть экран создания вакансии
             let vc = UIViewController()
             vc.view.backgroundColor = .systemBackground
-            vc.title = "createVacancy".localized
-            
-        
-            let label = UILabel()
-            label.text = "💼 Создание вакансии\n(скоро)"
-            label.numberOfLines = 0
-            label.textAlignment = .center
-            label.font = .systemFont(ofSize: 24, weight: .medium)
-            label.textColor = .secondaryLabel
-            label.translatesAutoresizingMaskIntoConstraints = false
-            vc.view.addSubview(label)
-            
-            NSLayoutConstraint.activate([
-                label.centerXAnchor.constraint(equalTo: vc.view.centerXAnchor),
-                label.centerYAnchor.constraint(equalTo: vc.view.centerYAnchor)
-            ])
-            
             navigationController.setViewControllers([vc], animated: false)
+            return
         }
+        
+        let viewController: UIViewController
+        if user.isApplicant {
+            let viewModel = CreateResumeViewModel(userManager: userManager)
+            viewController = CreateResumeViewController(viewModel: viewModel, coordinator: self)
+        } else {
+            let viewModel = CreateVacancyViewModel(userManager: userManager)
+            viewController = CreateVacancyViewController(viewModel: viewModel, coordinator: self)
+        }
+        
+        // ✅ Заменяем весь стек на один контроллер — кнопки «Назад» нет
+        navigationController.setViewControllers([viewController], animated: false)
+    }
+
     
+    @objc private func profileUpdated() {
+        showAppropriateScreen()
+    }
 }
 
 extension CreateCoordinator: CreateCoordinatorProtocol {

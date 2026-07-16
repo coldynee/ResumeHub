@@ -137,6 +137,9 @@ final class EditProfileViewModel {
                 self?.userManager.saveUser(updatedUser)
                 self?.user = updatedUser
                 self?.saveSuccess = true
+                DispatchQueue.main.async {
+                    NotificationCenter.default.post(name: NotificationNames.userProfileUpdated, object: nil)
+                }
                 print("✅ Пользователь сохранён в UserManager с avatarURL = \(avatarURL ?? "nil")")
 
             }

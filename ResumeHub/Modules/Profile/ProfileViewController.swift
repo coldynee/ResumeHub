@@ -181,7 +181,7 @@ final class ProfileViewController: UIViewController {
     }
     
     @objc private func myResumesTapped() {
-        
+        coordinator.showMyItems()
     }
     
     @objc private func settignsTapped() {
