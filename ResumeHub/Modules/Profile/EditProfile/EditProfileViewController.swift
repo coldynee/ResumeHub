@@ -555,7 +555,14 @@ class EditProfileViewController: UIViewController {
     }
     
     @objc private func emailInfoTapped() {
-        showToast(message: "emailChangeWarningMessage".localized)
+        ToastPresenter.shared.showToast(
+                in: view,
+                icon: UIImage(systemName: "exclamationmark.triangle.fill"),
+                iconColor: .systemOrange,
+                message: "emailChangeWarningMessage".localized,
+                duration: 4.0,
+                position: .below(emailTextField)
+            )
     }
     
     @objc private func hideToast() {

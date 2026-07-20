@@ -45,14 +45,14 @@ extension MyItemsCoordinator: MyItemsCoordinatorProtocol {
     }
     
     func showResumeDetail(_ resume: Resume) {
-        let detailVC = ItemDetailViewController(item: .resume(resume))
+        let detailVC = ItemDetailViewController(item: .resume(resume), source: .myItems)
         detailVC.parentCoordinator = self
         self.detailViewController = detailVC
         navigationController.pushViewController(detailVC, animated: true)
     }
     
     func showVacancyDetail(_ vacancy: Vacancy) {
-        let detailVC = ItemDetailViewController(item: .vacancy(vacancy))
+        let detailVC = ItemDetailViewController(item: .vacancy(vacancy), source: .myItems)
         detailVC.parentCoordinator = self
         self.detailViewController = detailVC
         navigationController.pushViewController(detailVC, animated: true)

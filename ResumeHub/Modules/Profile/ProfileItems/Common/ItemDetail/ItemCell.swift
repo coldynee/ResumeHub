@@ -17,7 +17,7 @@ final class ItemCell: UITableViewCell {
         
         imageView?.contentMode = .scaleAspectFit
         imageView?.tintColor = .primaryBlueContent
-        
+        backgroundColor = .primaryBackground
         textLabel?.font = .systemFont(ofSize: 17, weight: .medium)
         detailTextLabel?.font = .systemFont(ofSize: 14)
         detailTextLabel?.textColor = .secondaryLabel

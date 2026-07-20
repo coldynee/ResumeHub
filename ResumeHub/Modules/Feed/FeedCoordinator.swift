@@ -9,10 +9,12 @@ import Foundation
 import UIKit
 
 protocol FeedCoordinatorProtocol: AnyObject {
-    //feed logic
+    func showResumeDetail(_ resume: Resume)
+    func showVacancyDetail(_ vacancy: Vacancy)
 }
 
 final class FeedCoordinator: Coordinator {
+    
     var navigationController: UINavigationController
     
     var childCoordinators: [Coordinator] = []
@@ -39,5 +41,13 @@ final class FeedCoordinator: Coordinator {
 }
 
 extension FeedCoordinator: FeedCoordinatorProtocol {
-    // feed logic
+    func showResumeDetail(_ resume: Resume) {
+        let detailVC = ItemDetailViewController(item: .resume(resume), source: .feed)
+        navigationController.pushViewController(detailVC, animated: true)
+    }
+    
+    func showVacancyDetail(_ vacancy: Vacancy) {
+        let detailVC = ItemDetailViewController(item: .vacancy(vacancy), source: .feed)
+        navigationController.pushViewController(detailVC, animated: true)
+    }
 }

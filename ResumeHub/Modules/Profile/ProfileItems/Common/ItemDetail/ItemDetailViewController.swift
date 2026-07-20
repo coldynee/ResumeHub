@@ -18,6 +18,8 @@ final class ItemDetailViewController: UIViewController {
     weak var parentCoordinator: MyItemsCoordinator?
     
     private var item: ItemType
+    private var itemId: String?
+    private let source: DetailSource
     
     private let scrollView = UIScrollView()
     private let contentView = UIView()
@@ -70,9 +72,32 @@ final class ItemDetailViewController: UIViewController {
         return label
     }()
     
+    private lazy var editButton: UIBarButtonItem = {
+        let button = UIBarButtonItem(
+            image: UIImage(systemName: "pencil"),
+            style: .plain,
+            target: self,
+            action: #selector(editTapped)
+        )
+        button.tintColor = .primaryBlueContent
+        return button
+    }()
     
-    init(item: ItemType) {
+    private lazy var favoriteButton: UIBarButtonItem = {
+        let button = UIBarButtonItem(
+            image: UIImage(systemName: "heart"),
+            style: .plain,
+            target: self,
+            action: #selector(favoriteButtonTapped)
+        )
+        button.tintColor = .systemGray3
+        return button
+    }()
+    
+    
+    init(item: ItemType, source: DetailSource) {
         self.item = item
+        self.source = source
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -89,7 +114,10 @@ final class ItemDetailViewController: UIViewController {
     }
     
     private func setupUI() {
-        view.backgroundColor = .systemBackground
+        view.backgroundColor = .primaryBackground
+        
+        scrollView.backgroundColor = .primaryBackground
+        contentView.backgroundColor = .primaryBackground
         
         view.addSubview(scrollView)
         scrollView.addSubview(contentView)
@@ -160,17 +188,19 @@ final class ItemDetailViewController: UIViewController {
         descriptionLabel.text = resume.description
         skillsOrRequirementsLabel.text = "skills".localized + ": " + (resume.skills.isEmpty ? "notSpecified".localized : resume.skills.joined(separator: ", "))
         locationLabel.isHidden = true
+        itemId = resume.id
+
     }
     
     private func setupNavigationBar() {
-        let editButton = UIBarButtonItem(
-            image: UIImage(systemName: "pencil"),
-            style: .plain,
-            target: self,
-            action: #selector(editTapped)
-        )
-        editButton.tintColor = .primaryBlueContent
-        navigationItem.rightBarButtonItem = editButton
+        switch source {
+                case .myItems:
+                    navigationItem.rightBarButtonItem = editButton
+
+                case .feed, .favorites:
+                    navigationItem.rightBarButtonItem = favoriteButton
+                    updateFavoriteButtonState()
+                }
     }
     
     func updateItem(with resume: Resume) {
@@ -201,6 +231,42 @@ final class ItemDetailViewController: UIViewController {
         skillsOrRequirementsLabel.text = "requirements".localized + ": " + (vacancy.requirements.isEmpty ? "notSpecified".localized : vacancy.requirements.joined(separator: ", "))
         locationLabel.text = "📍 " + vacancy.location
         locationLabel.isHidden = false
+        itemId = vacancy.id
+
+    }
+    
+    @objc private func favoriteButtonTapped() {
+        guard let itemId = itemId else { return }
+            
+        // Определяем тип как Bool (true = resume, false = vacancy)
+        let type: FavoriteType
+        switch item {
+        case .resume:
+            type = .resume
+        case .vacancy:
+            type = .vacancy
+        }
+            
+        let _ = FavoriteManager.shared.toggleFavorite(itemId: itemId, type: type) { [weak self] isFavorite in
+            self?.updateFavoriteButtonState()
+            print("❤️ \(isFavorite ? "Добавлено" : "Удалено") из избранного: \(itemId)")
+        }
+    }
+        
+    private func updateFavoriteButtonState() {
+        guard let itemId = itemId else { return }
+        
+        let isFavorite = FavoriteManager.shared.isFavorite(itemId: itemId)
+        
+        let newButton = UIBarButtonItem(
+                image: UIImage(systemName: isFavorite ? "heart.fill" : "heart"),
+                style: .plain,
+                target: self,
+                action: #selector(favoriteButtonTapped)
+            )
+            newButton.tintColor = isFavorite ? .systemRed : .systemGray3
+            
+            navigationItem.rightBarButtonItem = newButton
     }
     
 }

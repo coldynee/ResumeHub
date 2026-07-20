@@ -53,9 +53,9 @@ class MyItemsViewController: UIViewController {
     }
     
     private func setupUI() {
-        view.backgroundColor = .systemBackground
+        view.backgroundColor = .primaryBackground
         title = viewModel.isApplicant ? "myResumes".localized : "myVacancies".localized
-        
+        tableView.backgroundColor = .primaryBackground
         view.addSubview(tableView)
         view.addSubview(emptyStateLabel)
         view.addSubview(activityIndicator)

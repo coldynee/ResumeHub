@@ -9,7 +9,8 @@ import Foundation
 import UIKit
 
 protocol FavoritesCoordinatorProtocol: AnyObject {
-    // fav logic
+    func showResumeDetail(_ resume: Resume)
+    func showVacancyDetail(_ vacancy: Vacancy)
 }
 
 final class FavoritesCoordinator: Coordinator {
@@ -37,5 +38,14 @@ final class FavoritesCoordinator: Coordinator {
 }
 
 extension FavoritesCoordinator: FavoritesCoordinatorProtocol {
-    // fav logic
+    func showResumeDetail(_ resume: Resume) {
+        let detailVC = ItemDetailViewController(item: .resume(resume), source: .favorites)
+        navigationController.pushViewController(detailVC, animated: true)
+    }
+    
+    func showVacancyDetail(_ vacancy: Vacancy) {
+        let detailVC = ItemDetailViewController(item: .vacancy(vacancy), source: .favorites)
+        navigationController.pushViewController(detailVC, animated: true)
+    }
+
 }
